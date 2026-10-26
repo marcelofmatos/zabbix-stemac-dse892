@@ -3,7 +3,7 @@
 	"id": "geradormovel",
 	"name": "Gerador (celular)",
 	"namespace": "GeradorMovel",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"author": "Marcelo Matos",
 	"description": "Página do gerador para celular: estado, motor, comandos e gráficos (mesmos dados do Painel do gerador). Requer o módulo painel-gerador instalado: usa o painel-estado.js dele.",
 	"actions": {

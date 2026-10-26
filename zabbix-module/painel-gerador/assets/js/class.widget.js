@@ -52,9 +52,11 @@ class CWidgetPainelGerador extends CWidget {
 		}
 
 		const corpo = this.#el('div', 'pg-corpo');
+		const cabecalho_diagrama = this.#el('div', 'pg-moldura-cabecalho');
 
+		cabecalho_diagrama.append(this.#subtitulo('🔌 Diagrama'), this.#linkMovel(response.hostid));
 		corpo.append(
-			this.#moldura('pg-moldura-diagrama', '🔌 Diagrama', this.#diagrama(estado)),
+			this.#moldura('pg-moldura-diagrama', cabecalho_diagrama, this.#diagrama(estado)),
 			this.#moldura('pg-moldura-controle', '🚦 Estado',
 				this.#modos(estado.modo), this.#alarme(estado.alarme, response),
 				this.#subtitulo('⚙️ Motor'), this.#motor(estado.motor),
@@ -64,12 +66,25 @@ class CWidgetPainelGerador extends CWidget {
 		raiz.appendChild(corpo);
 	}
 
+	// titulo: texto do subtítulo ou um cabeçalho já montado.
 	#moldura(classe, titulo, ...conteudo) {
 		const moldura = this.#el('section', `pg-moldura ${classe}`);
 
-		moldura.append(this.#subtitulo(titulo), ...conteudo);
+		moldura.append(typeof titulo === 'string' ? this.#subtitulo(titulo) : titulo, ...conteudo);
 
 		return moldura;
+	}
+
+	// Página "Gerador (celular)" do mesmo host (módulo gerador-movel).
+	#linkMovel(hostid) {
+		const link = this.#el('a', 'pg-link-movel', '📱 Versão celular');
+		const url = new URL('zabbix.php', location.href);
+
+		url.searchParams.set('action', 'gerador.movel');
+		url.searchParams.set('hostid', hostid);
+		link.setAttribute('href', url.href);
+
+		return link;
 	}
 
 	#subtitulo(texto) {

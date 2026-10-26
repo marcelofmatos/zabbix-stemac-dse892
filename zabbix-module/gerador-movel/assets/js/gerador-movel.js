@@ -178,7 +178,7 @@ class CGeradorMovel {
 
 	#topo(agora) {
 		const topo = this.#el('div', 'gm-topo');
-		const link = this.#el('a', 'gm-link', 'Abrir dashboard');
+		const link = this.#el('a', 'gm-link', '🖥️ Versão completa');
 		const url = new URL('zabbix.php', location.href);
 
 		url.searchParams.set('action', 'host.dashboard.view');
