@@ -503,11 +503,13 @@ zabbix_export:
         error_handler: DISCARD_VALUE
       - type: JAVASCRIPT
         parameters:
-        - return Math.min(value * 100 / {$DSE.FUEL.FULL}, 100);
+        - 'var v = (value - {$DSE.FUEL.EMPTY}) * 100 / ({$DSE.FUEL.FULL} - {$DSE.FUEL.EMPTY});
+
+          return Math.min(Math.max(v, 0), 100);'
       tags:
       - tag: component
         value: motor
-      description: 'Nível real do tanque: leitura do controlador × 100 / {$DSE.FUEL.FULL} (leitura com o tanque cheio), limitado a 100 %.'
+      description: 'Nível real do tanque: (leitura do controlador − {$DSE.FUEL.EMPTY}) × 100 / ({$DSE.FUEL.FULL} − {$DSE.FUEL.EMPTY}), limitado a 0–100 %.'
     - uuid: 64c492878da342d098641186cec870ac
       name: 'Motor: tensão da bateria de partida'
       type: SNMP_AGENT
@@ -761,6 +763,9 @@ zabbix_export:
     - macro: '{$DSE.FUEL.FULL}'
       value: '100'
       description: Leitura do sensor (%) com o tanque cheio. 100 = sem correção
+    - macro: '{$DSE.FUEL.EMPTY}'
+      value: '0'
+      description: Leitura do sensor (%) com o tanque vazio. 0 = sem correção
     - macro: '{$DSE.BATT.MIN}'
       value: '11'
     - macro: '{$DSE.COOLANT.MAX}'

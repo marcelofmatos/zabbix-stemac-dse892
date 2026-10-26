@@ -72,6 +72,7 @@ Vincule-o a um host com **interface SNMP v2c** apontando para o DSE892 e defina 
 | `{$DSE.GEN.LOAD.AMIN}` | 5 | Corrente que indica gerador com carga (A) |
 | `{$DSE.FUEL.LOW}` / `{$DSE.FUEL.CRIT}` | 50 / 20 | Combustível baixo / crítico (%) |
 | `{$DSE.FUEL.FULL}` | 100 | Leitura do sensor com o tanque cheio. Para tanque adaptado (ex.: marca 63 % cheio), defina no host e o item reescala para 0–100 % |
+| `{$DSE.FUEL.EMPTY}` | 0 | Leitura do sensor com o tanque vazio (ex.: marca 20 % vazio). Nível = (leitura − EMPTY) × 100 / (FULL − EMPTY), limitado a 0–100 % |
 | `{$DSE.BATT.MIN}` | 11 | Bateria de partida mínima (V) |
 | `{$DSE.COOLANT.MAX}` | 95 | Temperatura máxima do motor (°C) |
 

@@ -87,13 +87,14 @@ items.append(instrument(2, "dse.engine.oil.pressure", "Motor: pressão do óleo"
 items.append(instrument(3, "dse.engine.coolant.temp", "Motor: temperatura do líquido de arrefecimento", "°C",
                         signed=True, tags=("component", "motor")))
 combustivel = instrument(4, "dse.fuel.level", "Motor: nível de combustível", "%", tags=("component", "motor"))
-# Tanque adaptado: o sensor marca {$DSE.FUEL.FULL} % com o tanque cheio; reescala para 0–100 %.
+# Tanque adaptado: o sensor marca {$DSE.FUEL.EMPTY} % vazio e {$DSE.FUEL.FULL} % cheio; reescala para 0–100 %.
 combustivel["preprocessing"].append({
     "type": "JAVASCRIPT",
-    "parameters": ["return Math.min(value * 100 / {$DSE.FUEL.FULL}, 100);"],
+    "parameters": ["var v = (value - {$DSE.FUEL.EMPTY}) * 100 / ({$DSE.FUEL.FULL} - {$DSE.FUEL.EMPTY});\n"
+                   "return Math.min(Math.max(v, 0), 100);"],
 })
-combustivel["description"] = ("Nível real do tanque: leitura do controlador × 100 / {$DSE.FUEL.FULL} "
-                              "(leitura com o tanque cheio), limitado a 100 %.")
+combustivel["description"] = ("Nível real do tanque: (leitura do controlador − {$DSE.FUEL.EMPTY}) × 100 / "
+                              "({$DSE.FUEL.FULL} − {$DSE.FUEL.EMPTY}), limitado a 0–100 %.")
 items.append(combustivel)
 items.append(instrument(5, "dse.battery.volt", "Motor: tensão da bateria de partida", "V", "0.1",
                         tags=("component", "motor"), triggers=[
@@ -303,6 +304,8 @@ export = {"zabbix_export": {
             {"macro": "{$DSE.FUEL.CRIT}", "value": "20"},
             {"macro": "{$DSE.FUEL.FULL}", "value": "100",
              "description": "Leitura do sensor (%) com o tanque cheio. 100 = sem correção"},
+            {"macro": "{$DSE.FUEL.EMPTY}", "value": "0",
+             "description": "Leitura do sensor (%) com o tanque vazio. 0 = sem correção"},
             {"macro": "{$DSE.BATT.MIN}", "value": "11"},
             {"macro": "{$DSE.COOLANT.MAX}", "value": "95"},
         ],
