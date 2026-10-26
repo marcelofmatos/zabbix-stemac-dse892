@@ -56,7 +56,7 @@ class CWidgetPainelGerador extends CWidget {
 		corpo.append(
 			this.#moldura('pg-moldura-diagrama', '🔌 Diagrama', this.#diagrama(estado)),
 			this.#moldura('pg-moldura-controle', '🚦 Estado',
-				this.#modos(estado.modo), this.#alarme(estado.alarme, response.severidades),
+				this.#modos(estado.modo), this.#alarme(estado.alarme, response),
 				this.#subtitulo('⚙️ Motor'), this.#motor(estado.motor),
 				this.#subtitulo('🎛️ Comandos'), this.#botoes(estado, response)
 			)
@@ -130,17 +130,27 @@ class CWidgetPainelGerador extends CWidget {
 		return modos;
 	}
 
-	#alarme({severidade, total}, severidades) {
+	#alarme({severidade, total}, {severidades, hostid}) {
 		const alarme = this.#el('div', 'pg-alarme');
 
 		if (severidade === -1) {
-			alarme.appendChild(this.#el('span', 'status-green', '✅ Sem problemas'));
+			alarme.appendChild(this.#el('span', 'pg-badge status-green', '✅ Sem problemas'));
+
+			return alarme;
 		}
-		else {
-			alarme.appendChild(this.#el('span', severidades[severidade].classe,
-				`${PainelGeradorEstado.emojiAlarme(severidade)} ${severidades[severidade].nome} · ${total} ${total === 1 ? 'problema' : 'problemas'}`
-			));
-		}
+
+		// Link para os mesmos problemas: os do host, incluindo suprimidos (a contagem também os inclui).
+		const link = this.#el('a', `pg-badge ${severidades[severidade].classe}`,
+			`${PainelGeradorEstado.emojiAlarme(severidade)} ${severidades[severidade].nome} · ${total} ${total === 1 ? 'problema' : 'problemas'} ›`
+		);
+		const url = new URL('zabbix.php', location.href);
+
+		url.searchParams.set('action', 'problem.view');
+		url.searchParams.set('filter_set', 1);
+		url.searchParams.set('hostids[]', hostid);
+		url.searchParams.set('show_suppressed', 1);
+		link.setAttribute('href', url.href);
+		alarme.appendChild(link);
 
 		return alarme;
 	}

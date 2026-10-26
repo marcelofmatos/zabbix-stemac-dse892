@@ -254,6 +254,30 @@
 	font-style: italic;
 }
 
+/* O tema fixa height: 16px, borda e cor de texto escura nas classes de severidade; aqui vira badge. */
+.painel-gerador .pg-alarme {
+	display: flex;
+	justify-content: center;
+}
+
+.painel-gerador .pg-alarme > .pg-badge {
+	height: auto;
+	padding: 3px 12px;
+	border: 0;
+	border-radius: 12px;
+	line-height: normal;
+	color: #ffffff;
+	font-size: 12px;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.painel-gerador .pg-alarme > a.pg-badge:hover,
+.painel-gerador .pg-alarme > a.pg-badge:focus {
+	color: #ffffff;
+	filter: brightness(0.9);
+}
+
 .painel-gerador .pg-segmentado {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
