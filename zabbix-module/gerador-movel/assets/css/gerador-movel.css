@@ -470,3 +470,24 @@
 		font-size: 18px;
 	}
 }
+
+/* Resultado do comando (popup.scriptexec do Zabbix): Ok centralizado e janela que cabe no celular.
+   O tema fixa min-width: 450px na janela e o Zabbix põe width: 540px inline na caixa de resposta. */
+.overlay-dialogue.modal:has(#execution-output) {
+	box-sizing: border-box;
+	min-width: 0;
+	max-width: calc(100vw - 20px);
+}
+
+.overlay-dialogue.modal:has(#execution-output) #execution-output {
+	box-sizing: border-box;
+	width: 100% !important;
+}
+
+.overlay-dialogue.modal:has(#execution-output) .overlay-dialogue-footer {
+	text-align: center;
+}
+
+.overlay-dialogue.modal:has(#execution-output) .overlay-dialogue-footer button {
+	margin: 0;
+}
