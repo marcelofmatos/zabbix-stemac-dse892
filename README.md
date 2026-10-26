@@ -116,18 +116,34 @@ e `{$DSE.WEB.PASS}` (secreta).
 
 ## 4. Módulos de frontend
 
-Copie as pastas de [`zabbix-module/`](zabbix-module/) para o diretório de módulos do frontend
-(`/usr/share/zabbix/modules/`). Na imagem Docker oficial, monte um volume:
+**Imagem Docker** (recomendado): `ghcr.io/marcelofmatos/zabbix-stemac-dse892` é o frontend oficial
+`zabbix/zabbix-web-apache-pgsql:ubuntu-7.0-latest` com os quatro módulos já em
+`/usr/share/zabbix/modules/`. Troque só a imagem do serviço web; as variáveis de ambiente são as mesmas:
 
 ```yaml
 services:
   zabbix-web:
-    volumes:
-      - ./modules:/usr/share/zabbix/modules:ro
+    image: ghcr.io/marcelofmatos/zabbix-stemac-dse892:1   # ou a versão exata, ex.: 1.0.0
+    environment:
+      - DB_SERVER_HOST=postgres
+      - POSTGRES_USER=zabbix
+      - POSTGRES_PASSWORD=...
+      - ZBX_SERVER_HOST=zabbix-server
 ```
 
-Depois, em *Administration → General → Modules*: **Scan directory** e ative os módulos. Para
-atualizar, basta copiar os arquivos, sem recriar o container.
+- A primeira linha do log mostra a versão: `zabbix-stemac-dse892 1.0.0 iniciando`.
+- Tags: `X.Y.Z`, `X.Y`, `X` e `latest`. Para voltar atrás, aponte para a versão anterior.
+- Outra base (nginx, MySQL): `docker build --build-arg ZABBIX_WEB_IMAGE=zabbix/zabbix-web-nginx-mysql
+  --build-arg ZABBIX_TAG=ubuntu-7.0-latest -t meu-zabbix-web .`
+- **Releases:** *Actions → 🚀 Release and build → Run workflow* (patch, minor ou major). O workflow
+  [`release-and-build.yml`](.github/workflows/release-and-build.yml) roda os testes, cria a tag e a
+  release e publica a imagem no GHCR.
+
+**Sem a imagem:** copie as pastas de [`zabbix-module/`](zabbix-module/) para
+`/usr/share/zabbix/modules/` do frontend.
+
+Nos dois casos, depois em *Administration → General → Modules*: **Scan directory** e ative os
+módulos. O estado ativo fica no banco, então trocar a versão da imagem não exige ativar de novo.
 
 - **Painel do gerador** (`painel-gerador`): widget já incluído na dashboard do template
   ("Gerador - visão geral"). Também pode ser adicionado a qualquer dashboard, escolhendo o host.

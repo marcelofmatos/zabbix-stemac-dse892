@@ -1,0 +1,7 @@
+.git
+.github
+.env
+docs
+zabbix
+zabbix-module/tests
+**/__pycache__

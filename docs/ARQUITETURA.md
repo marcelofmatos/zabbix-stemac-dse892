@@ -12,7 +12,7 @@ flowchart LR
     subgraph Zabbix["Zabbix 7.0"]
         SRV["Zabbix server<br/>poller SNMP + webhooks"]
         TRAP["Receptor de traps<br/>porta 162"]
-        WEB["Frontend<br/>módulos em /usr/share/zabbix/modules"]
+        WEB["Frontend<br/>imagem zabbix-stemac-dse892<br/>módulos em /usr/share/zabbix/modules"]
         DB[("Banco")]
         TRAP --> SRV
         SRV --> DB
@@ -24,6 +24,8 @@ flowchart LR
     SRV -- "HTTP POST co_inst_button.cgi<br/>comandos" --> GW
     USER -- "HTTPS" --> WEB
     WEB -- "Script.execute" --> SRV
+    GHCR[("GHCR<br/>ghcr.io/marcelofmatos/zabbix-stemac-dse892")]
+    GHCR -. "docker pull" .-> WEB
 ```
 
 | Peça | Onde está | Papel |
@@ -34,6 +36,8 @@ flowchart LR
 | `gerador-movel` | página `gerador.movel` | mesmos dados do painel, layout de celular; reusa `painel-estado.js` |
 | `pwa-zabbix` | módulo comum | manifest e metas de app em todas as páginas |
 | `atalhos` | widget | links para dashboards |
+| Imagem | `Dockerfile` | frontend oficial + os quatro módulos; entrypoint loga a versão e chama o oficial |
+| CI/CD | `.github/workflows/release-and-build.yml` | testes, tag SemVer, release e push da imagem no GHCR |
 
 ## Fluxo 1 — Coleta
 
@@ -99,4 +103,15 @@ sequenceDiagram
     end
     F-->>P: resultado
     P->>F: atualiza o estado
+```
+
+## Fluxo 4 — Release e build da imagem
+
+```mermaid
+flowchart LR
+    A["Run workflow<br/>patch, minor ou major"] --> T["Job test<br/>Node, Python, PHP<br/>template gerado = versionado"]
+    T --> R["Job release<br/>próxima tag SemVer<br/>GitHub Release com changelog"]
+    R --> B["Job build<br/>docker build com APP_VERSION"]
+    B --> P[("GHCR<br/>X.Y.Z, X.Y, X, latest")]
+    P --> D["Stack do Zabbix<br/>troca a imagem do frontend"]
 ```
