@@ -186,7 +186,12 @@ var PainelGeradorEstado = (() => {
 		};
 	}
 
-	return {calcular};
+	// Emoji do alarme pela severidade do Zabbix: 4-5 (Alta, Desastre), 2-3 (Atenção, Média), 0-1.
+	function emojiAlarme(severidade) {
+		return severidade >= 4 ? '🚨' : severidade >= 2 ? '⚠️' : 'ℹ️';
+	}
+
+	return {calcular, emojiAlarme};
 })();
 
 if (typeof module !== 'undefined' && module.exports) {

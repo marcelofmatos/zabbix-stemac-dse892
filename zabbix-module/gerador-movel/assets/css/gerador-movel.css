@@ -182,10 +182,29 @@
 }
 
 .gerador-movel .gm-titulo {
+	display: flex;
+	gap: 8px;
+	align-items: center;
 	margin: 0;
 	font-size: 15px;
 	font-weight: bold;
 	letter-spacing: 1px;
+}
+
+.gerador-movel .gm-icone-svg {
+	flex: 0 0 auto;
+	width: 22px;
+	height: 22px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+}
+
+.gerador-movel .gm-icone-letra {
+	fill: currentColor;
+	stroke: none;
+	font-size: 12px;
+	font-weight: bold;
 }
 
 /* rótulo | L1 | L2 | L3 | unidade */

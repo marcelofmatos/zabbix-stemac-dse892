@@ -165,11 +165,11 @@ class CGeradorMovel {
 		}
 
 		itens.push(
-			this.#secao('Estado', this.#modos(estado.modo), this.#badges(estado, resposta.severidades)
+			this.#secao('🚦 Estado', this.#modos(estado.modo), this.#badges(estado, resposta.severidades)
 			),
 			...this.#cartoes(estado),
-			this.#secao('Motor', this.#motor(estado.motor)),
-			this.#secao('Comandos', ...this.#botoes(estado, resposta))
+			this.#secao('⚙️ Motor', this.#motor(estado.motor)),
+			this.#secao('🎛️ Comandos', ...this.#botoes(estado, resposta))
 		);
 
 		this.#conteudo.replaceChildren(...itens);
@@ -223,12 +223,12 @@ class CGeradorMovel {
 
 	#alarme({severidade, total}, severidades) {
 		if (severidade === -1) {
-			return this.#el('span', 'gm-badge status-green', 'Sem problemas');
+			return this.#el('span', 'gm-badge status-green', '✅ Sem problemas');
 		}
 
 		// Link para os mesmos problemas: os do host, incluindo suprimidos (a contagem também os inclui).
 		const link = this.#el('a', `gm-badge ${severidades[severidade].classe}`,
-			`${severidades[severidade].nome} · ${total} ${total === 1 ? 'problema' : 'problemas'} ›`
+			`${PainelGeradorEstado.emojiAlarme(severidade)} ${severidades[severidade].nome} · ${total} ${total === 1 ? 'problema' : 'problemas'} ›`
 		);
 		const url = new URL('zabbix.php', location.href);
 
@@ -246,20 +246,20 @@ class CGeradorMovel {
 		const falha = fonte === 'rede' && rede.anormal;
 
 		return this.#el('span', `gm-badge gm-selo ${falha ? 'gm-selo-falha' : 'gm-selo-ok'}`,
-			`Carga alimentada ${fonte === 'rede' ? 'pela REDE' : 'pelo GERADOR'} (estimado)`
+			`${fonte === 'rede' ? '🔌 Carga alimentada pela REDE' : '⚡ Carga alimentada pelo GERADOR'} (estimado)`
 		);
 	}
 
 	#cartoes({rede, gerador, carga, fonte}) {
 		const cartoes = {
-			rede: this.#cartao('REDE', rede.anormal ? ['LEITURA ANORMAL', 'gm-selo-falha'] : ['NORMAL', 'gm-selo-ok'],
+			rede: this.#cartao('REDE', this.#iconeRede(), rede.anormal ? ['LEITURA ANORMAL', 'gm-selo-falha'] : ['NORMAL', 'gm-selo-ok'],
 				['Tensão', 'V', rede.volts], [['Frequência', rede.freq, 1, 'Hz']]
 			),
-			gerador: this.#cartao('GERADOR', gerador.girando ? ['GIRANDO', 'gm-selo-ok'] : ['PARADO', 'gm-selo-neutro'],
+			gerador: this.#cartao('GERADOR', this.#iconeGerador(), gerador.girando ? ['GIRANDO', 'gm-selo-ok'] : ['PARADO', 'gm-selo-neutro'],
 				['Tensão', 'V', gerador.volts],
 				[['Frequência', gerador.freq, 1, 'Hz'], ['Rotação', gerador.rpm, 0, 'rpm']]
 			),
-			carga: this.#cartao('CARGA', null, ['Corrente', 'A', carga.correntes], [['Potência', carga.kw, 2, 'kW']])
+			carga: this.#cartao('CARGA', this.#iconeCarga(), null, ['Corrente', 'A', carga.correntes], [['Potência', carga.kw, 2, 'kW']])
 		};
 
 		cartoes[fonte].classList.add('gm-ativo');
@@ -273,12 +273,15 @@ class CGeradorMovel {
 	}
 
 	// Grade rótulo | L1 | L2 | L3 | unidade; os pares (Frequência, Rotação, Potência) alinham com L1.
-	#cartao(titulo, selo, [grandeza, unidade, fases], pares) {
+	#cartao(titulo, icone, selo, [grandeza, unidade, fases], pares) {
 		const cartao = this.#el('section', 'gm-cartao');
 		const cabecalho = this.#el('div', 'gm-cabecalho');
 		const grade = this.#el('div', 'gm-grade');
 
-		cabecalho.appendChild(this.#el('h2', 'gm-titulo', titulo));
+		const nome = this.#el('h2', 'gm-titulo');
+
+		nome.append(icone, titulo);
+		cabecalho.appendChild(nome);
 
 		if (selo !== null) {
 			cabecalho.appendChild(this.#el('span', `gm-selo ${selo[1]}`, selo[0]));
@@ -309,22 +312,22 @@ class CGeradorMovel {
 		const tabela = this.#el('div', 'gm-medidas');
 
 		tabela.append(
-			...this.#medida('Bateria', this.#formatar(motor.bateria.valor, 1, 'V'), motor.bateria.faixa),
-			...this.#medida('Temperatura', this.#formatar(motor.temperatura.valor, 0, '°C'),
+			...this.#medida('🔋 Bateria', this.#formatar(motor.bateria.valor, 1, 'V'), motor.bateria.faixa),
+			...this.#medida('🌡️ Temperatura', this.#formatar(motor.temperatura.valor, 0, '°C'),
 				motor.temperatura.faixa
 			),
-			...this.#medida('Óleo',
+			...this.#medida('🛢️ Óleo',
 				motor.oleo.semLeitura ? 'sem leitura' : this.#formatar(motor.oleo.valor, 0, 'kPa'), null
 			),
-			...this.#medida('Horas', this.#formatar(motor.horas, 1, 'h'), null),
-			...this.#medida('Partidas', this.#formatar(motor.partidas, 0, ''), null)
+			...this.#medida('⏱️ Horas', this.#formatar(motor.horas, 1, 'h'), null),
+			...this.#medida('🔁 Partidas', this.#formatar(motor.partidas, 0, ''), null)
 		);
 
 		const tanque = this.#el('div', 'gm-tanque-coluna');
 
 		tanque.append(this.#tanque(motor.combustivel),
 			this.#el('span', 'gm-tanque-valor', this.#formatar(motor.combustivel.valor, 0, '%')),
-			this.#el('span', 'gm-rotulo', 'Combustível')
+			this.#el('span', 'gm-rotulo', '⛽ Combustível')
 		);
 
 		const bloco = this.#el('div', 'gm-motor');
@@ -440,7 +443,7 @@ class CGeradorMovel {
 	}
 
 	#graficos(graficos) {
-		const secao = this.#secao('Gráficos (6 h)');
+		const secao = this.#secao('📈 Gráficos (6 h)');
 
 		for (const {graphid, nome} of graficos) {
 			const img = this.#el('img', 'gm-grafico');
@@ -468,6 +471,43 @@ class CGeradorMovel {
 			url.searchParams.set('_', agora);
 			img.setAttribute('src', url.href);
 		}
+	}
+
+	// Mesmos ícones dos blocos do Painel do gerador.
+	#iconeRede() {
+		const svg = this.#svg('svg', {class: 'gm-icone-svg', viewBox: '0 0 24 24'});
+
+		svg.append(
+			this.#svg('circle', {cx: 12, cy: 12, r: 10}),
+			this.#svg('path', {d: 'M5 12 Q8.5 5 12 12 T19 12'})
+		);
+
+		return svg;
+	}
+
+	#iconeGerador() {
+		const svg = this.#svg('svg', {class: 'gm-icone-svg', viewBox: '0 0 24 24'});
+		const letra = this.#svg('text', {x: 12, y: 16.5, 'text-anchor': 'middle', class: 'gm-icone-letra'});
+
+		letra.textContent = 'G';
+		svg.append(this.#svg('circle', {cx: 12, cy: 12, r: 10}), letra);
+
+		return svg;
+	}
+
+	#iconeCarga() {
+		const svg = this.#svg('svg', {class: 'gm-icone-svg', viewBox: '0 0 24 24'});
+
+		svg.append(
+			this.#svg('rect', {x: 4, y: 3, width: 16, height: 18, rx: 1}),
+			this.#svg('line', {x1: 4, y1: 9, x2: 20, y2: 9}),
+			this.#svg('line', {x1: 4, y1: 15, x2: 20, y2: 15}),
+			this.#svg('line', {x1: 7, y1: 6, x2: 10, y2: 6}),
+			this.#svg('line', {x1: 7, y1: 12, x2: 10, y2: 12}),
+			this.#svg('line', {x1: 7, y1: 18, x2: 10, y2: 18})
+		);
+
+		return svg;
 	}
 
 	#svg(tag, atributos) {

@@ -270,6 +270,10 @@ const cenarios = {
 		assert.strictEqual(r.rede.volts[0], 127.5);
 		assert.strictEqual(r.motor.combustivel.valor, null);
 		assert.strictEqual(r.motor.bateria.valor, null);
+	},
+
+	'emoji do alarme por severidade': () => {
+		assert.deepStrictEqual([0, 1, 2, 3, 4, 5].map(Estado.emojiAlarme), ['ℹ️', 'ℹ️', '⚠️', '⚠️', '🚨', '🚨']);
 	}
 };
 

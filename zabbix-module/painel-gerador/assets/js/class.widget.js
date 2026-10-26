@@ -54,11 +54,11 @@ class CWidgetPainelGerador extends CWidget {
 		const corpo = this.#el('div', 'pg-corpo');
 
 		corpo.append(
-			this.#moldura('pg-moldura-diagrama', 'Diagrama', this.#diagrama(estado)),
-			this.#moldura('pg-moldura-controle', 'Estado',
+			this.#moldura('pg-moldura-diagrama', '🔌 Diagrama', this.#diagrama(estado)),
+			this.#moldura('pg-moldura-controle', '🚦 Estado',
 				this.#modos(estado.modo), this.#alarme(estado.alarme, response.severidades),
-				this.#subtitulo('Motor'), this.#motor(estado.motor),
-				this.#subtitulo('Comandos'), this.#botoes(estado, response)
+				this.#subtitulo('⚙️ Motor'), this.#motor(estado.motor),
+				this.#subtitulo('🎛️ Comandos'), this.#botoes(estado, response)
 			)
 		);
 		raiz.appendChild(corpo);
@@ -96,7 +96,7 @@ class CWidgetPainelGerador extends CWidget {
 				[['Frequência', gerador.freq, 1, 'Hz'], ['Rotação', gerador.rpm, 0, 'rpm']]
 			),
 			carga: this.#bloco('pg-carga', 'CARGA', this.#iconeCarga(),
-				[`alimentada ${fonte === 'rede' ? 'pela REDE' : 'pelo GERADOR'} (estimado)`,
+				[`${fonte === 'rede' ? '🔌 alimentada pela REDE' : '⚡ alimentada pelo GERADOR'} (estimado)`,
 					trecho[fonte] === 'pg-falha' ? 'pg-selo-falha' : 'pg-selo-ok'
 				],
 				['Corrente', 'A', carga.correntes], [['Potência', carga.kw, 2, 'kW']]
@@ -134,11 +134,11 @@ class CWidgetPainelGerador extends CWidget {
 		const alarme = this.#el('div', 'pg-alarme');
 
 		if (severidade === -1) {
-			alarme.appendChild(this.#el('span', 'status-green', 'Sem problemas'));
+			alarme.appendChild(this.#el('span', 'status-green', '✅ Sem problemas'));
 		}
 		else {
 			alarme.appendChild(this.#el('span', severidades[severidade].classe,
-				`${severidades[severidade].nome} · ${total} ${total === 1 ? 'problema' : 'problemas'}`
+				`${PainelGeradorEstado.emojiAlarme(severidade)} ${severidades[severidade].nome} · ${total} ${total === 1 ? 'problema' : 'problemas'}`
 			));
 		}
 
@@ -149,16 +149,16 @@ class CWidgetPainelGerador extends CWidget {
 		const tabela = this.#el('div', 'pg-medidas');
 
 		tabela.append(
-			...this.#medida('Combustível', this.#formatar(motor.combustivel.valor, 0, '%'), motor.combustivel.faixa),
-			...this.#medida('Bateria', this.#formatar(motor.bateria.valor, 1, 'V'), motor.bateria.faixa),
-			...this.#medida('Temperatura', this.#formatar(motor.temperatura.valor, 0, '°C'),
+			...this.#medida('⛽ Combustível', this.#formatar(motor.combustivel.valor, 0, '%'), motor.combustivel.faixa),
+			...this.#medida('🔋 Bateria', this.#formatar(motor.bateria.valor, 1, 'V'), motor.bateria.faixa),
+			...this.#medida('🌡️ Temperatura', this.#formatar(motor.temperatura.valor, 0, '°C'),
 				motor.temperatura.faixa
 			),
-			...this.#medida('Óleo',
+			...this.#medida('🛢️ Óleo',
 				motor.oleo.semLeitura ? 'sem leitura' : this.#formatar(motor.oleo.valor, 0, 'kPa'), null
 			),
-			...this.#medida('Horas', this.#formatar(motor.horas, 1, 'h'), null),
-			...this.#medida('Partidas', this.#formatar(motor.partidas, 0, ''), null)
+			...this.#medida('⏱️ Horas', this.#formatar(motor.horas, 1, 'h'), null),
+			...this.#medida('🔁 Partidas', this.#formatar(motor.partidas, 0, ''), null)
 		);
 
 		const tanque = this.#el('div', 'pg-tanque-coluna');
