@@ -4,7 +4,7 @@
 	"type": "widget",
 	"name": "Painel do gerador",
 	"namespace": "PainelGerador",
-	"version": "1.8.1",
+	"version": "1.8.2",
 	"author": "Marcelo Matos",
 	"description": "Painel de controle do gerador (DSE7320 via DSE892): diagrama unifilar, modo, alarmes, motor e botões de comando.",
 	"widget": {
@@ -13,7 +13,7 @@
 			"width": 36,
 			"height": 10
 		},
-		"refresh_rate": 30
+		"refresh_rate": 10
 	},
 	"actions": {
 		"widget.painelgerador.view": {

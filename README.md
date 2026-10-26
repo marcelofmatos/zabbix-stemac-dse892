@@ -150,7 +150,7 @@ módulos. O estado ativo fica no banco, então trocar a versão da imagem não e
   ("Gerador - visão geral"). Também pode ser adicionado a qualquer dashboard, escolhendo o host.
   A posição das chaves no diagrama é **estimada**, porque o DSE892 não informa os contatores.
 - **Gerador (celular)** (`gerador-movel`): `zabbix.php?action=gerador.movel[&hostid=…]`. Sem
-  `hostid`, abre o primeiro host visível com o template. Atualiza a cada 30 s. **Depende do
+  `hostid`, abre o primeiro host visível com o template. Atualiza a cada 10 s. **Depende do
   `painel-gerador`** ativo (usa o `painel-estado.js` dele). Requer navegador com `:has()` (Chrome
   105+, iOS 15.4+).
 - **PWA** (`pwa-zabbix`): injeta o manifest e as metas de app em todas as páginas. No celular:

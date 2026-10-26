@@ -50,7 +50,7 @@ sequenceDiagram
         G->>C: leitura GenComm via RS485
         C-->>G: instrumentos e estado
     end
-    loop a cada 1 min
+    loop a cada 20 s - medições do painel. 10 s - modo. 1 min ou mais - demais itens
         Z->>G: SNMP GET instrumentTable e controlTable
         G-->>Z: valores brutos ou NULL
         Z->>Z: descarta sentinelas e aplica escala

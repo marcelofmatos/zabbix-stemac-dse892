@@ -64,20 +64,23 @@ def k(key):
 
 
 items = []
+# Medições que o painel mostra em tempo real (rede, saída, carga e rotação); o resto muda devagar.
+RAPIDO = "20s"
 
 # --- Rede (entrada) ---
 for col, ph in ((24, "L1-N"), (25, "L2-N"), (26, "L3-N"), (27, "L1-L2"), (28, "L2-L3"), (29, "L3-L1")):
-    items.append(instrument(col, f"dse.mains.volt[{ph}]", f"Rede: tensão {ph}", "V", "0.1",
+    items.append(instrument(col, f"dse.mains.volt[{ph}]", f"Rede: tensão {ph}", "V", "0.1", delay=RAPIDO,
                             tags=("component", "rede")))
-items.append(instrument(23, "dse.mains.freq", "Rede: frequência", "Hz", "0.1", tags=("component", "rede")))
+items.append(instrument(23, "dse.mains.freq", "Rede: frequência", "Hz", "0.1", delay=RAPIDO,
+                        tags=("component", "rede")))
 
 # --- Gerador (saída) ---
 for col, ph in ((7, "L1-N"), (8, "L2-N"), (9, "L3-N"), (19, "L1-L2"), (20, "L2-L3"), (21, "L3-L1")):
-    items.append(instrument(col, f"dse.gen.volt[{ph}]", f"Gerador: tensão {ph}", "V", "0.1"))
-items.append(instrument(18, "dse.gen.freq", "Gerador: frequência", "Hz", "0.1"))
+    items.append(instrument(col, f"dse.gen.volt[{ph}]", f"Gerador: tensão {ph}", "V", "0.1", delay=RAPIDO))
+items.append(instrument(18, "dse.gen.freq", "Gerador: frequência", "Hz", "0.1", delay=RAPIDO))
 for col, ph in ((10, "L1"), (11, "L2"), (12, "L3")):
-    items.append(instrument(col, f"dse.gen.current[{ph}]", f"Gerador: corrente {ph}", "A", "0.1"))
-items.append(instrument(52, "dse.gen.power", "Gerador: potência ativa total", "W", signed=True))
+    items.append(instrument(col, f"dse.gen.current[{ph}]", f"Gerador: corrente {ph}", "A", "0.1", delay=RAPIDO))
+items.append(instrument(52, "dse.gen.power", "Gerador: potência ativa total", "W", signed=True, delay=RAPIDO))
 items.append(instrument(56, "dse.gen.va", "Gerador: potência aparente total", "VA"))
 items.append(instrument(64, "dse.gen.pf", "Gerador: fator de potência médio", "", "0.01", signed=True))
 items.append(instrument(92, "dse.gen.kwh", "Gerador: energia acumulada", "kWh", "0.1", delay="10m"))
@@ -103,7 +106,7 @@ items.append(instrument(5, "dse.battery.volt", "Motor: tensão da bateria de par
                                  "Bateria lida como 0: o DSE892 perdeu o DSE7320 (RS485) e devolve NULL, "
                                  "que o Zabbix grava como 0. Demais triggers do controlador ficam suspensas."),
                         ]))
-items.append(instrument(6, "dse.engine.rpm", "Motor: rotação", "rpm", tags=("component", "motor"), triggers=[
+items.append(instrument(6, "dse.engine.rpm", "Motor: rotação", "rpm", delay=RAPIDO, tags=("component", "motor"), triggers=[
     trig("Gerador: motor em funcionamento",
          f"min({k('dse.engine.rpm')},2m)>0", "WARNING",
          "Motor girando. Esperado durante falta de rede ou teste programado.",
@@ -258,7 +261,7 @@ dashboard = {
     "pages": [{"widgets": [
         # widget do módulo painel-gerador (zabbix-module/); host vem do contexto
         {"type": "painelgerador", "name": "Painel do gerador", "x": "0", "y": "0", "width": "72",
-         "height": str(PAINEL_ALTURA)},
+         "height": str(PAINEL_ALTURA), "fields": [{"type": "INTEGER", "name": "rf_rate", "value": "10"}]},
     ] + abaixo(PAINEL_ALTURA, [
         # gráficos: tensão de entrada x saída, corrente da carga
         w_graph(0, 0, 36, 8, G_MAINS),

@@ -249,7 +249,7 @@ class CWidgetPainelGerador extends CWidget {
 
 	/*
 	 * Confirmação, "digite GERADOR" e o resultado da execução são overlays do frontend: a atualização pós-comando
-	 * espera todos fecharem (a atualização periódica de 30 s segue normalmente).
+	 * espera todos fecharem (a atualização periódica de 10 s segue normalmente).
 	 */
 	#atualizarAposDialogos() {
 		this.#pararEsperaDialogos();
