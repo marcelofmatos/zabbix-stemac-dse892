@@ -115,14 +115,15 @@ items.append(instrument(95, "dse.engine.starts", "Motor: número de partidas", "
                         value_type="UNSIGNED", delay="10m", tags=("component", "motor")))
 
 # --- Controle / gateway ---
+# Modo a cada 10 s: o painel só libera PARTIDA depois de ler Manual/Teste.
 items.append({
     "uuid": uid("dse.mode"), "name": "Controlador: modo de operação (código)", "type": "SNMP_AGENT",
-    "snmp_oid": f"{CTRL}.2.{{$DSE.INSTANCE}}", "key": "dse.mode", "delay": "1m",
+    "snmp_oid": f"{CTRL}.2.{{$DSE.INSTANCE}}", "key": "dse.mode", "delay": "10s",
     "value_type": "UNSIGNED", "tags": [{"tag": "component", "value": "controle"}],
 })
 items.append({
     "uuid": uid("dse.mode.text"), "name": "Controlador: modo de operação", "type": "SNMP_AGENT",
-    "snmp_oid": f"{CTRL}.3.{{$DSE.INSTANCE}}", "key": "dse.mode.text", "delay": "1m",
+    "snmp_oid": f"{CTRL}.3.{{$DSE.INSTANCE}}", "key": "dse.mode.text", "delay": "10s",
     "history": "30d", "value_type": "CHAR",
     "preprocessing": [{"type": "DISCARD_UNCHANGED_HEARTBEAT", "parameters": ["1h"]}],
     "tags": [{"tag": "component", "value": "controle"}],

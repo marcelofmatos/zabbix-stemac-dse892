@@ -5,7 +5,8 @@
 class CGeradorMovel {
 
 	static ATUALIZAR_MS = 30000;
-	static ATUALIZAR_APOS_DIALOGOS_MS = 2000;
+	// Maior que a coleta do modo (10 s), para a página já mostrar o modo novo.
+	static ATUALIZAR_APOS_DIALOGOS_MS = 11000;
 	static VERIFICAR_DIALOGOS_MS = 500;
 	static GRAFICO_ALTURA = 320;
 

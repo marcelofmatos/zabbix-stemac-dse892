@@ -1,6 +1,7 @@
 class CWidgetPainelGerador extends CWidget {
 
-	static ATUALIZAR_APOS_DIALOGOS_S = 2;
+	// Maior que a coleta do modo (10 s), para o painel já mostrar o modo novo.
+	static ATUALIZAR_APOS_DIALOGOS_S = 11;
 	static VERIFICAR_DIALOGOS_MS = 500;
 
 	// Comando e rótulo; o símbolo vem de #iconeTecla. Grade de 3: modos na 1ª linha, motor na 2ª.
