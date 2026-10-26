@@ -61,12 +61,16 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: ⚙️ Setup Git
+        env:
+          ACTOR: ${{ github.actor }}
         run: |
-          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
-          git config --local user.name "${{ github.actor }}"
+          git config --local user.email "$ACTOR@users.noreply.github.com"
+          git config --local user.name "$ACTOR"
 
       - name: 🔢 Calculate new version
         id: version
+        env:
+          VERSION_TYPE: ${{ github.event.inputs.version_type }}
         run: |
           git fetch --tags
 
@@ -89,7 +93,7 @@ jobs:
             MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
             PATCH=$(echo "$CURRENT_VERSION" | cut -d. -f3)
 
-            case "${{ github.event.inputs.version_type }}" in
+            case "$VERSION_TYPE" in
               "major")
                 NEW_VERSION="$((MAJOR + 1)).0.0"
                 ;;
@@ -143,16 +147,18 @@ jobs:
           fi
 
       - name: 📋 Create GitHub release
+        # Valores por env, não por ${{ }} no script: o changelog vem de mensagens de commit.
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+          CURRENT_VERSION: ${{ steps.version.outputs.current_version }}
+          VERSION_TYPE: ${{ github.event.inputs.version_type }}
+          CHANGES: ${{ steps.changes.outputs.changelog }}
+          PRERELEASE: ${{ github.event.inputs.prerelease }}
+          ACTOR: ${{ github.actor }}
         run: |
-          NEW_VERSION="${{ steps.version.outputs.new_version }}"
-          CURRENT_VERSION="${{ steps.version.outputs.current_version }}"
-          VERSION_TYPE="${{ github.event.inputs.version_type }}"
-          CHANGES="${{ steps.changes.outputs.changelog }}"
-
           PRERELEASE_FLAG=""
-          if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
+          if [ "$PRERELEASE" = "true" ]; then
             PRERELEASE_FLAG="--prerelease"
           fi
 
@@ -202,7 +208,7 @@ jobs:
           ### 📋 Release Info
           - **Type**: $VERSION_TYPE release
           - **Previous Version**: $CURRENT_VERSION
-          - **Released by**: @${{ github.actor }}
+          - **Released by**: @$ACTOR
           EOF
           )
 
