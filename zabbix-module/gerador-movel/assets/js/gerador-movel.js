@@ -167,7 +167,7 @@ class CGeradorMovel {
 		itens.push(
 			this.#secao('🚦 Estado', this.#modos(estado.modo), this.#badges(estado, resposta.severidades)
 			),
-			...this.#cartoes(estado),
+			this.#unifilar(estado),
 			this.#secao('⚙️ Motor', this.#motor(estado.motor)),
 			this.#secao('🎛️ Comandos', ...this.#botoes(estado, resposta))
 		);
@@ -250,7 +250,14 @@ class CGeradorMovel {
 		);
 	}
 
-	#cartoes({rede, gerador, carga, fonte}) {
+	// Diagrama unifilar na vertical, aproveitando a largura: REDE -> chave -> CARGA <- chave <- GERADOR.
+	#unifilar({rede, gerador, carga, fonte}) {
+		// Classe de cada trecho (fonte -> chave -> carga), a mesma regra do painel.
+		const trecho = {
+			rede: rede.anormal ? 'gm-falha' : (fonte === 'rede' ? 'gm-energizado' : 'gm-morto'),
+			gerador: fonte === 'gerador' ? 'gm-energizado' : 'gm-morto'
+		};
+
 		const cartoes = {
 			rede: this.#cartao('REDE', this.#iconeRede(), rede.anormal ? ['LEITURA ANORMAL', 'gm-selo-falha'] : ['NORMAL', 'gm-selo-ok'],
 				['Tensão', 'V', rede.volts], [['Frequência', rede.freq, 1, 'Hz']]
@@ -269,7 +276,28 @@ class CGeradorMovel {
 			cartoes.rede.appendChild(this.#el('div', 'gm-nota', 'leitura do controlador'));
 		}
 
-		return [cartoes.rede, cartoes.gerador, cartoes.carga];
+		const unifilar = this.#el('div', 'gm-unifilar');
+
+		unifilar.append(cartoes.rede, this.#chave(trecho.rede, fonte === 'rede'), cartoes.carga,
+			this.#chave(trecho.gerador, fonte === 'gerador'), cartoes.gerador
+		);
+
+		return unifilar;
+	}
+
+	// Chave entre dois cartões, centralizada: fechada na fonte que alimenta a carga, aberta (inclinada) na outra.
+	#chave(classe, fechada) {
+		const svg = this.#svg('svg', {class: 'gm-ligacao', viewBox: '-20 0 40 50', preserveAspectRatio: 'xMidYMid meet'});
+
+		svg.append(
+			this.#svg('line', {x1: 0, y1: 0, x2: 0, y2: 14, class: classe}),
+			this.#svg('line', {x1: 0, y1: 14, x2: fechada ? 0 : 12, y2: fechada ? 36 : 32, class: classe}),
+			this.#svg('line', {x1: 0, y1: 36, x2: 0, y2: 50, class: classe}),
+			this.#svg('circle', {cx: 0, cy: 14, r: 3, class: 'gm-contato'}),
+			this.#svg('circle', {cx: 0, cy: 36, r: 3, class: 'gm-contato'})
+		);
+
+		return svg;
 	}
 
 	// Grade rótulo | L1 | L2 | L3 | unidade; os pares (Frequência, Rotação, Potência) alinham com L1.
