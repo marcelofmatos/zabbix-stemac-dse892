@@ -166,3 +166,7 @@ do próprio DSE892 (*Configuration → Filesystem*) ou vista em
 | `.1.3.4.1.2` | `keypressTable` | **escrita**: envia teclas ao controlador |
 
 Do MIB-II, o DSE892 só implementa `system`.
+
+## Licença
+
+[MIT](LICENSE). O ícone da mão na tecla MANUAL é o "pointer" do [Lucide](https://lucide.dev) (ISC).
