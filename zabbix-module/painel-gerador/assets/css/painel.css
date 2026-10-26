@@ -1,0 +1,392 @@
+/* Sem cor de fundo fixa: herda o tema do Zabbix (claro/escuro); tons neutros via rgba. */
+.painel-gerador {
+	--pg-borda: rgba(128, 128, 128, 0.45);
+	--pg-moldura: rgba(128, 128, 128, 0.3);
+	--pg-apagado: rgba(128, 128, 128, 0.25);
+	--pg-verde: #34af67;
+	--pg-ambar: #f1a50b;
+	--pg-vermelho: #d64e4e;
+
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	height: 100%;
+	box-sizing: border-box;
+	padding: 4px 8px;
+	overflow: auto;
+	color: inherit;
+	container-type: inline-size;
+}
+
+.painel-gerador .pg-comunicacao {
+	padding: 6px 10px;
+	border: 1px solid var(--pg-ambar);
+	border-left-width: 4px;
+	font-weight: bold;
+}
+
+/* Diagrama à esquerda, coluna de controle à direita; as duas molduras com a mesma altura. */
+.painel-gerador .pg-corpo {
+	display: grid;
+	grid-template-columns: minmax(0, 720px) 290px;
+	gap: 16px;
+	align-items: stretch;
+}
+
+@container (max-width: 760px) {
+	.painel-gerador .pg-corpo {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.painel-gerador .pg-moldura {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 8px 12px 12px;
+	border: 1px solid var(--pg-moldura);
+	border-radius: 8px;
+}
+
+.painel-gerador .pg-subtitulo {
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	opacity: 0.6;
+}
+
+.painel-gerador .pg-moldura-controle .pg-subtitulo:not(:first-child) {
+	padding-top: 8px;
+	border-top: 1px solid var(--pg-moldura);
+}
+
+/* Centraliza o diagrama na vertical quando a coluna de controle for mais alta. */
+.painel-gerador .pg-diagrama {
+	margin-block: auto;
+	container-type: inline-size;
+}
+
+/* REDE e GERADOR dividem a mesma linha (mesma altura); CARGA fica com a altura do conteúdo. */
+.painel-gerador .pg-unifilar {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-areas:
+		"rede gerador"
+		"barra barra"
+		"carga carga";
+	column-gap: 16px;
+}
+
+.painel-gerador .pg-rede {
+	grid-area: rede;
+}
+
+.painel-gerador .pg-gerador {
+	grid-area: gerador;
+}
+
+.painel-gerador .pg-carga {
+	grid-area: carga;
+	justify-self: center;
+	width: calc(50% - 8px);
+	box-sizing: border-box;
+}
+
+.painel-gerador .pg-barramento {
+	grid-area: barra;
+	display: block;
+	width: 100%;
+	height: 70px;
+}
+
+@container (max-width: 520px) {
+	.painel-gerador .pg-unifilar {
+		grid-template-columns: 1fr;
+		grid-template-areas: "rede" "gerador" "carga";
+		row-gap: 8px;
+	}
+
+	.painel-gerador .pg-carga {
+		width: auto;
+		justify-self: stretch;
+	}
+
+	.painel-gerador .pg-barramento {
+		display: none;
+	}
+}
+
+.painel-gerador .pg-barramento line {
+	stroke-width: 3;
+	stroke-linecap: round;
+}
+
+.painel-gerador .pg-barramento .pg-morto {
+	stroke: var(--pg-borda);
+}
+
+.painel-gerador .pg-barramento .pg-energizado {
+	stroke: var(--pg-verde);
+	stroke-width: 5;
+}
+
+.painel-gerador .pg-barramento .pg-falha {
+	stroke: var(--pg-vermelho);
+	stroke-dasharray: 6 4;
+}
+
+.painel-gerador .pg-barramento .pg-contato {
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+	opacity: 0.6;
+}
+
+.painel-gerador .pg-bloco {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 6px 10px 8px;
+	border: 2px solid var(--pg-borda);
+	border-radius: 6px;
+}
+
+.painel-gerador .pg-bloco.pg-ativo {
+	border-color: var(--pg-verde);
+}
+
+.painel-gerador .pg-bloco.pg-anormal {
+	border-color: var(--pg-vermelho);
+}
+
+.painel-gerador .pg-anormal .pg-numero,
+.painel-gerador .pg-nota {
+	color: var(--pg-vermelho);
+}
+
+.painel-gerador .pg-cabecalho {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+}
+
+.painel-gerador .pg-icone-svg {
+	flex: 0 0 auto;
+	width: 20px;
+	height: 20px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+}
+
+.painel-gerador .pg-icone-letra {
+	fill: currentColor;
+	stroke: none;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.painel-gerador .pg-titulo {
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.painel-gerador .pg-selo {
+	margin-left: auto;
+	padding: 2px 8px;
+	border-radius: 10px;
+	color: #ffffff;
+	font-size: 10px;
+	font-weight: bold;
+}
+
+.painel-gerador .pg-selo-ok {
+	background-color: var(--pg-verde);
+}
+
+.painel-gerador .pg-selo-falha {
+	background-color: var(--pg-vermelho);
+}
+
+.painel-gerador .pg-selo-neutro {
+	background-color: #808080;
+}
+
+/* rótulo | L1 | L2 | L3 | unidade */
+.painel-gerador .pg-grade {
+	display: grid;
+	grid-template-columns: 76px repeat(3, 52px) auto;
+	gap: 2px 10px;
+	align-items: baseline;
+}
+
+.painel-gerador .pg-fase {
+	font-size: 11px;
+	text-align: right;
+	opacity: 0.7;
+}
+
+.painel-gerador .pg-numero {
+	font-size: 16px;
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.painel-gerador .pg-unidade {
+	font-size: 11px;
+	opacity: 0.7;
+}
+
+/* Nos pares (Frequência, Rotação, Potência) a unidade ocupa o resto da linha, logo após o valor em L1. */
+.painel-gerador .pg-unidade-par {
+	grid-column: 3 / -1;
+}
+
+.painel-gerador .pg-rotulo {
+	opacity: 0.8;
+}
+
+.painel-gerador .pg-nota {
+	font-size: 11px;
+	font-style: italic;
+}
+
+.painel-gerador .pg-segmentado {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	border: 1px solid var(--pg-borda);
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.painel-gerador .pg-segmento {
+	padding: 6px 0;
+	text-align: center;
+	opacity: 0.55;
+}
+
+.painel-gerador .pg-segmento + .pg-segmento {
+	border-left: 1px solid var(--pg-borda);
+}
+
+.painel-gerador .pg-segmento.pg-aceso {
+	background-color: var(--pg-verde);
+	color: #ffffff;
+	font-weight: bold;
+	opacity: 1;
+}
+
+.painel-gerador .pg-motor {
+	display: flex;
+	gap: 14px;
+	align-items: center;
+}
+
+.painel-gerador .pg-tanque-coluna {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+}
+
+.painel-gerador .pg-tanque-valor {
+	font-size: 16px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.painel-gerador .pg-tanque {
+	flex: 0 0 auto;
+	width: 36px;
+	height: 64px;
+}
+
+.painel-gerador .pg-tanque-contorno {
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+}
+
+.painel-gerador .pg-tanque-marca {
+	stroke: currentColor;
+	stroke-width: 1.5;
+	opacity: 0.6;
+}
+
+.painel-gerador .pg-nivel-ok {
+	fill: var(--pg-verde);
+}
+
+.painel-gerador .pg-nivel-atencao {
+	fill: var(--pg-ambar);
+}
+
+.painel-gerador .pg-nivel-critico {
+	fill: var(--pg-vermelho);
+}
+
+.painel-gerador .pg-medidas {
+	display: grid;
+	grid-template-columns: max-content max-content;
+	gap: 4px 12px;
+	align-items: center;
+	font-variant-numeric: tabular-nums;
+}
+
+.painel-gerador .pg-botoes {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 8px;
+}
+
+.painel-gerador .pg-botoes .pg-botao {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	width: 100%;
+	height: 56px;
+	padding: 6px 4px;
+	line-height: 1;
+	font-weight: bold;
+}
+
+.painel-gerador .pg-botao .pg-icone::before {
+	font-size: 22px;
+}
+
+.painel-gerador .pg-botao .pg-cadeado {
+	position: absolute;
+	top: 3px;
+	right: 3px;
+}
+
+.painel-gerador .pg-botao .pg-cadeado::before {
+	font-size: 14px;
+}
+
+/* Celular (widget estreito): alvos de toque maiores e grade usando a largura do bloco. */
+@container (max-width: 520px) {
+	.painel-gerador .pg-grade {
+		grid-template-columns: 72px repeat(3, minmax(0, 1fr)) auto;
+	}
+
+	.painel-gerador .pg-numero {
+		font-size: 18px;
+	}
+
+	.painel-gerador .pg-segmento {
+		padding: 12px 0;
+	}
+
+	.painel-gerador .pg-botoes .pg-botao {
+		height: 64px;
+		font-size: 13px;
+	}
+}

@@ -1,0 +1,341 @@
+/* Carregado só na página do gerador. Sem cor de fundo fixa: herda o tema do Zabbix (claro/escuro). */
+
+/* O tema fixa min-width: 1200px em header/main/footer; aqui a página tem de caber no celular. */
+.wrapper:has(.gerador-movel) > header,
+.wrapper:has(.gerador-movel) > main,
+.wrapper:has(.gerador-movel) > footer,
+.wrapper:has(.gerador-movel) > output {
+	min-width: 0;
+}
+
+.gerador-movel {
+	--gm-borda: rgba(128, 128, 128, 0.45);
+	--gm-moldura: rgba(128, 128, 128, 0.3);
+	--gm-verde: #34af67;
+	--gm-ambar: #f1a50b;
+	--gm-vermelho: #d64e4e;
+
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	max-width: 560px;
+	margin: 0 auto;
+	font-size: 14px;
+	color: inherit;
+}
+
+.gerador-movel .gm-conteudo {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.gerador-movel .gm-topo {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 16px;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.gerador-movel .gm-hora {
+	opacity: 0.8;
+}
+
+.gerador-movel .gm-link {
+	padding: 8px 0;
+	font-weight: bold;
+}
+
+.gerador-movel .gm-aviso,
+.gerador-movel .gm-comunicacao {
+	padding: 10px 12px;
+	border: 1px solid var(--gm-ambar);
+	border-left-width: 4px;
+	font-weight: bold;
+}
+
+.gerador-movel .gm-secao,
+.gerador-movel .gm-cartao {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	min-width: 0;
+	padding: 10px 12px 12px;
+	border: 1px solid var(--gm-moldura);
+	border-radius: 8px;
+}
+
+.gerador-movel .gm-subtitulo {
+	margin: 0;
+	font-size: 14px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	opacity: 0.65;
+}
+
+.gerador-movel .gm-segmentado {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	border: 1px solid var(--gm-borda);
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.gerador-movel .gm-segmento {
+	padding: 12px 0;
+	font-size: 15px;
+	text-align: center;
+	opacity: 0.55;
+}
+
+.gerador-movel .gm-segmento + .gm-segmento {
+	border-left: 1px solid var(--gm-borda);
+}
+
+.gerador-movel .gm-segmento.gm-aceso {
+	background-color: var(--gm-verde);
+	color: #ffffff;
+	font-weight: bold;
+	opacity: 1;
+}
+
+.gerador-movel .gm-badges {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 8px;
+}
+
+/* O tema fixa height: 16px nos rótulos status-*; aqui eles são maiores. */
+.gerador-movel .gm-badges > .gm-badge {
+	height: auto;
+	padding: 4px 12px;
+	border-radius: 12px;
+	line-height: normal;
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.gerador-movel .gm-valor > span {
+	height: auto;
+	padding: 3px 8px;
+	line-height: normal;
+	font-size: inherit;
+}
+
+.gerador-movel .gm-selo {
+	padding: 3px 10px;
+	border-radius: 12px;
+	color: #ffffff;
+	font-size: 13px;
+	font-weight: bold;
+}
+
+.gerador-movel .gm-selo-ok {
+	background-color: var(--gm-verde);
+}
+
+.gerador-movel .gm-selo-falha {
+	background-color: var(--gm-vermelho);
+}
+
+.gerador-movel .gm-selo-neutro {
+	background-color: #808080;
+}
+
+.gerador-movel .gm-cartao {
+	border-width: 2px;
+	border-color: var(--gm-borda);
+}
+
+.gerador-movel .gm-cartao.gm-ativo {
+	border-color: var(--gm-verde);
+}
+
+.gerador-movel .gm-cartao.gm-anormal {
+	border-color: var(--gm-vermelho);
+}
+
+.gerador-movel .gm-anormal .gm-numero,
+.gerador-movel .gm-nota {
+	color: var(--gm-vermelho);
+}
+
+.gerador-movel .gm-cabecalho {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.gerador-movel .gm-titulo {
+	margin: 0;
+	font-size: 15px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+/* rótulo | L1 | L2 | L3 | unidade */
+.gerador-movel .gm-grade {
+	display: grid;
+	grid-template-columns: max-content repeat(3, minmax(0, 1fr)) 28px;
+	gap: 4px 10px;
+	align-items: baseline;
+}
+
+.gerador-movel .gm-fase {
+	font-size: 14px;
+	text-align: right;
+	opacity: 0.7;
+}
+
+.gerador-movel .gm-numero {
+	font-size: 20px;
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.gerador-movel .gm-unidade {
+	font-size: 14px;
+	opacity: 0.7;
+}
+
+/* Nos pares a unidade ocupa o resto da linha, logo após o valor em L1. */
+.gerador-movel .gm-unidade-par {
+	grid-column: 3 / -1;
+}
+
+.gerador-movel .gm-rotulo {
+	opacity: 0.8;
+}
+
+.gerador-movel .gm-nota {
+	font-size: 14px;
+	font-style: italic;
+}
+
+.gerador-movel .gm-motor {
+	display: flex;
+	gap: 20px;
+	align-items: center;
+}
+
+.gerador-movel .gm-tanque-coluna {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+}
+
+.gerador-movel .gm-tanque {
+	width: 45px;
+	height: 80px;
+}
+
+.gerador-movel .gm-tanque-valor {
+	font-size: 20px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.gerador-movel .gm-tanque-contorno {
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+}
+
+.gerador-movel .gm-tanque-marca {
+	stroke: currentColor;
+	stroke-width: 1.5;
+	opacity: 0.6;
+}
+
+.gerador-movel .gm-nivel-ok {
+	fill: var(--gm-verde);
+}
+
+.gerador-movel .gm-nivel-atencao {
+	fill: var(--gm-ambar);
+}
+
+.gerador-movel .gm-nivel-critico {
+	fill: var(--gm-vermelho);
+}
+
+.gerador-movel .gm-medidas {
+	display: grid;
+	grid-template-columns: max-content max-content;
+	gap: 6px 14px;
+	align-items: center;
+	font-size: 15px;
+	font-variant-numeric: tabular-nums;
+}
+
+.gerador-movel .gm-botoes {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 10px;
+}
+
+.gerador-movel .gm-botoes .gm-botao {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	width: 100%;
+	height: 72px;
+	padding: 6px 4px;
+	line-height: 1;
+	font-size: 15px;
+	font-weight: bold;
+}
+
+.gerador-movel .gm-botao .gm-icone::before {
+	font-size: 24px;
+}
+
+.gerador-movel .gm-botao .gm-cadeado {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+}
+
+.gerador-movel .gm-botao .gm-cadeado::before {
+	font-size: 16px;
+}
+
+.gerador-movel .gm-motivos {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-size: 14px;
+}
+
+.gerador-movel .gm-grafico {
+	display: block;
+	width: 100%;
+	height: auto;
+	min-height: 120px;
+}
+
+/* Telas bem estreitas (≤ 360 px): os três valores por fase ainda cabem lado a lado. */
+@media (max-width: 360px) {
+	.gerador-movel .gm-grade {
+		column-gap: 6px;
+	}
+
+	.gerador-movel .gm-numero {
+		font-size: 18px;
+	}
+}

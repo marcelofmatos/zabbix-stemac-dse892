@@ -1,0 +1,25 @@
+/* Lista vertical de atalhos; o primeiro (Gerador) em destaque. Cores herdadas do tema. */
+.atalhos {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 6px 8px;
+	list-style: none;
+}
+
+.atalhos li a {
+	display: block;
+	padding: 8px 10px;
+	border: 1px solid rgba(128, 128, 128, 0.35);
+	border-radius: 6px;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.atalhos li a:hover {
+	border-color: currentColor;
+}
+
+.atalhos li:first-child a {
+	border-left: 4px solid #34af67;
+}

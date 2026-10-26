@@ -1,0 +1,45 @@
+{
+	"name": "Zabbix",
+	"short_name": "Zabbix",
+	"description": "Monitoramento Zabbix",
+	"lang": "pt-BR",
+	"start_url": "/zabbix.php?action=dashboard.view",
+	"scope": "/",
+	"display": "standalone",
+	"theme_color": "#0a466a",
+	"background_color": "#0a466a",
+	"icons": [
+		{
+			"src": "icons/icone-192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "icons/icone-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "icons/icone-maskable-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable"
+		}
+	],
+	"shortcuts": [
+		{
+			"name": "Gerador",
+			"short_name": "Gerador",
+			"url": "/zabbix.php?action=gerador.movel",
+			"icons": [
+				{
+					"src": "icons/icone-192.png",
+					"sizes": "192x192",
+					"type": "image/png"
+				}
+			]
+		}
+	]
+}

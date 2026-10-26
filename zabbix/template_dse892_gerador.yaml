@@ -1,0 +1,1128 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+  - uuid: bc1489585f084ad497973093ad8bd11c
+    name: Templates/Power
+  templates:
+  - uuid: e5bd27e0dd7744098f48482fee068a9d
+    template: DSE892 Gerador Stemac by SNMP
+    name: DSE892 Gerador Stemac by SNMP
+    description: 'Grupo gerador Stemac com controlador DSE7320, lido pelo gateway Deep Sea DSE892 (MIB DSE-892, enterprise 41385). Requer o módulo cadastrado no DSE892 com ''SNMP instance'' = {$DSE.INSTANCE}.
+      Doc: https://github.com/marcelofmatos/zabbix-stemac-dse892'
+    vendor:
+      name: Marcelo Matos
+      version: 1.0.0
+    groups:
+    - name: Templates/Power
+    items:
+    - uuid: 26477af54d09461cbbdd675cce76f6e0
+      name: 'Rede: tensão L1-N'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.24.{$DSE.INSTANCE}
+      key: dse.mains.volt[L1-N]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: rede
+    - uuid: b0888f8e94314df8971d5727a3c7e26e
+      name: 'Rede: tensão L2-N'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.25.{$DSE.INSTANCE}
+      key: dse.mains.volt[L2-N]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: rede
+    - uuid: fb11afe2455e46bb8670171a594d8b7d
+      name: 'Rede: tensão L3-N'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.26.{$DSE.INSTANCE}
+      key: dse.mains.volt[L3-N]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: rede
+    - uuid: 85c9bb9f7cb344dea49952bcb55adb4e
+      name: 'Rede: tensão L1-L2'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.27.{$DSE.INSTANCE}
+      key: dse.mains.volt[L1-L2]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: rede
+    - uuid: 96ca534edc504120bcadb6f1471bfe6a
+      name: 'Rede: tensão L2-L3'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.28.{$DSE.INSTANCE}
+      key: dse.mains.volt[L2-L3]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: rede
+    - uuid: aac6f3527b534b4d9cb10a3b0d566502
+      name: 'Rede: tensão L3-L1'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.29.{$DSE.INSTANCE}
+      key: dse.mains.volt[L3-L1]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: rede
+    - uuid: b8a01d8f4f49490dac44d53d698d2e71
+      name: 'Rede: frequência'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.23.{$DSE.INSTANCE}
+      key: dse.mains.freq
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: Hz
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: rede
+    - uuid: 44d40d4952e3419e8f94416da2ad5fc3
+      name: 'Gerador: tensão L1-N'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.7.{$DSE.INSTANCE}
+      key: dse.gen.volt[L1-N]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: 9dac203e172a4545a09f717d6f648437
+      name: 'Gerador: tensão L2-N'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.8.{$DSE.INSTANCE}
+      key: dse.gen.volt[L2-N]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: 819b837cb62945d38a19992cce654b42
+      name: 'Gerador: tensão L3-N'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.9.{$DSE.INSTANCE}
+      key: dse.gen.volt[L3-N]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: 18c9629a4fd24f049bf3ca1a048236db
+      name: 'Gerador: tensão L1-L2'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.19.{$DSE.INSTANCE}
+      key: dse.gen.volt[L1-L2]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: 59b3946fc5d64607b3ab3a4034c6784d
+      name: 'Gerador: tensão L2-L3'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.20.{$DSE.INSTANCE}
+      key: dse.gen.volt[L2-L3]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: 87978722ff254b72b2206dada8065b2b
+      name: 'Gerador: tensão L3-L1'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.21.{$DSE.INSTANCE}
+      key: dse.gen.volt[L3-L1]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: f811d010085749ecb2927e3b891cb035
+      name: 'Gerador: frequência'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.18.{$DSE.INSTANCE}
+      key: dse.gen.freq
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: Hz
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: a52aede794e445539583a6a11e6607e8
+      name: 'Gerador: corrente L1'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.10.{$DSE.INSTANCE}
+      key: dse.gen.current[L1]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: A
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: c828d1e18aba4b4ab64505eb572ef315
+      name: 'Gerador: corrente L2'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.11.{$DSE.INSTANCE}
+      key: dse.gen.current[L2]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: A
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: fe5807a335e748f3923520ce772e9570
+      name: 'Gerador: corrente L3'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.12.{$DSE.INSTANCE}
+      key: dse.gen.current[L3]
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: A
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: 21a8c803b3814a07bb68712aa522aff9
+      name: 'Gerador: potência ativa total'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.52.{$DSE.INSTANCE}
+      key: dse.gen.power
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: W
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '-2147483647'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: 12b55b346bdb4b4f8499bbe62bb6e1a3
+      name: 'Gerador: potência aparente total'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.56.{$DSE.INSTANCE}
+      key: dse.gen.va
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: VA
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: 851cbaf066914b908c7908a0d9d2ca90
+      name: 'Gerador: fator de potência médio'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.64.{$DSE.INSTANCE}
+      key: dse.gen.pf
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: ''
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '-2147483647'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.01'
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: 54a50e96635e46d2ad667fd10e94d023
+      name: 'Gerador: energia acumulada'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.92.{$DSE.INSTANCE}
+      key: dse.gen.kwh
+      delay: 10m
+      history: 90d
+      value_type: FLOAT
+      units: kWh
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: gerador
+    - uuid: e59111d60fc14e8490f241ccff816b06
+      name: 'Motor: pressão do óleo'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.2.{$DSE.INSTANCE}
+      key: dse.engine.oil.pressure
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: kPa
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      tags:
+      - tag: component
+        value: motor
+    - uuid: 3690660d87594d1fb4922896ff007014
+      name: 'Motor: temperatura do líquido de arrefecimento'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.3.{$DSE.INSTANCE}
+      key: dse.engine.coolant.temp
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: °C
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '-2147483647'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      tags:
+      - tag: component
+        value: motor
+    - uuid: ba2905e016b14d6aa9150b3907cfb665
+      name: 'Motor: nível de combustível'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.4.{$DSE.INSTANCE}
+      key: dse.fuel.level
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: '%'
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: JAVASCRIPT
+        parameters:
+        - return Math.min(value * 100 / {$DSE.FUEL.FULL}, 100);
+      tags:
+      - tag: component
+        value: motor
+      description: 'Nível real do tanque: leitura do controlador × 100 / {$DSE.FUEL.FULL} (leitura com o tanque cheio), limitado a 100 %.'
+    - uuid: 64c492878da342d098641186cec870ac
+      name: 'Motor: tensão da bateria de partida'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.5.{$DSE.INSTANCE}
+      key: dse.battery.volt
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: V
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      - type: MULTIPLIER
+        parameters:
+        - '0.1'
+      tags:
+      - tag: component
+        value: motor
+      triggers:
+      - uuid: cbd7c8b0214a4e7c966d089d8f12c4e0
+        expression: max(/DSE892 Gerador Stemac by SNMP/dse.battery.volt,3m)=0
+        name: 'Gerador: DSE892 sem leitura do controlador'
+        priority: HIGH
+        description: 'Bateria lida como 0: o DSE892 perdeu o DSE7320 (RS485) e devolve NULL, que o Zabbix grava como 0. Demais triggers do controlador ficam suspensas.'
+    - uuid: 974e1c06306747b1afda33eb581b4086
+      name: 'Motor: rotação'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.6.{$DSE.INSTANCE}
+      key: dse.engine.rpm
+      delay: 1m
+      history: 90d
+      value_type: FLOAT
+      units: rpm
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      tags:
+      - tag: component
+        value: motor
+      triggers:
+      - uuid: a845c4addf3343d3a59fc30e7956fb87
+        expression: min(/DSE892 Gerador Stemac by SNMP/dse.engine.rpm,2m)>0
+        name: 'Gerador: motor em funcionamento'
+        priority: WARNING
+        recovery_mode: RECOVERY_EXPRESSION
+        recovery_expression: max(/DSE892 Gerador Stemac by SNMP/dse.engine.rpm,5m)=0
+        description: Motor girando. Esperado durante falta de rede ou teste programado.
+    - uuid: b57d954515ca49a091df1dcfac07425e
+      name: 'Motor: tempo de funcionamento'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.91.{$DSE.INSTANCE}
+      key: dse.engine.hours
+      delay: 10m
+      history: 90d
+      value_type: UNSIGNED
+      units: s
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      tags:
+      - tag: component
+        value: motor
+    - uuid: 050cc329e98840548284377a2432d9aa
+      name: 'Motor: número de partidas'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.95.{$DSE.INSTANCE}
+      key: dse.engine.starts
+      delay: 10m
+      history: 90d
+      value_type: UNSIGNED
+      units: ''
+      preprocessing:
+      - type: IN_RANGE
+        parameters:
+        - '0'
+        - '2147483639'
+        error_handler: DISCARD_VALUE
+      tags:
+      - tag: component
+        value: motor
+    - uuid: c6cbb3f8d68f43fd8658e8dd19110c7e
+      name: 'Controlador: modo de operação (código)'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.3.1.2.{$DSE.INSTANCE}
+      key: dse.mode
+      delay: 1m
+      value_type: UNSIGNED
+      tags:
+      - tag: component
+        value: controle
+    - uuid: 9fe0107930b249b9b7ee18c457a89d97
+      name: 'Controlador: modo de operação'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.41385.1.3.3.1.3.{$DSE.INSTANCE}
+      key: dse.mode.text
+      delay: 1m
+      history: 30d
+      value_type: CHAR
+      preprocessing:
+      - type: DISCARD_UNCHANGED_HEARTBEAT
+        parameters:
+        - 1h
+      tags:
+      - tag: component
+        value: controle
+      triggers:
+      - uuid: 4c9d7dd1ae944417b8f97dc7ee072f63
+        expression: find(/DSE892 Gerador Stemac by SNMP/dse.mode.text,,"iregexp","auto")=0 and length(last(/DSE892 Gerador Stemac by SNMP/dse.mode.text))>0
+        name: 'Gerador: controlador fora do modo automático ({ITEM.LASTVALUE1})'
+        priority: HIGH
+        description: Fora do modo Auto o gerador não parte sozinho numa falta de rede.
+    - uuid: 1b39db4e1ffc4470ac5a8aaa2b2d666b
+      name: 'Gateway DSE892: uptime'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.2.1.1.3.0
+      key: dse.gw.uptime
+      delay: 1m
+      units: uptime
+      value_type: UNSIGNED
+      preprocessing:
+      - type: MULTIPLIER
+        parameters:
+        - '0.01'
+      tags:
+      - tag: component
+        value: gateway
+      triggers:
+      - uuid: eb4cc60c45d8437ebba7d7814153c8e1
+        expression: last(/DSE892 Gerador Stemac by SNMP/dse.gw.uptime)<600
+        name: Gateway DSE892 reiniciou
+        priority: INFO
+      - uuid: 71449e1accd142e092b0426f98c901bc
+        expression: nodata(/DSE892 Gerador Stemac by SNMP/dse.gw.uptime,10m)=1
+        name: Gateway DSE892 sem resposta SNMP há 10 min
+        priority: HIGH
+    - uuid: 926be80a7d0a4d8d9e0bc2529a89ebdf
+      name: 'Trap: evento DSE (dseEventTrap)'
+      type: SNMP_TRAP
+      key: snmptrap["41385\.1\.1\.2"]
+      value_type: LOG
+      history: 90d
+      description: Trap dseEventTrap (.1.3.6.1.4.1.41385.1.1.2.1) com a eventEntry nos varbinds.
+      tags:
+      - tag: component
+        value: trap
+    - uuid: fc7baf16162c41ed97937f2511f67291
+      name: 'Trap: descrição do evento'
+      type: DEPENDENT
+      key: dse.trap.description
+      delay: '0'
+      history: 90d
+      value_type: CHAR
+      preprocessing:
+      - type: REGEX
+        parameters:
+        - '41385\.1\.1\.1\.1\.6(?:\.\d+)* = (?:\w+: )?\"?([^\"\n]*)'
+        - \1
+        error_handler: DISCARD_VALUE
+      master_item:
+        key: snmptrap["41385\.1\.1\.2"]
+      tags:
+      - tag: component
+        value: trap
+    - uuid: fe4a08ece7f849dfa0ea8a496cf835ca
+      name: 'Trap: tipo do evento'
+      type: DEPENDENT
+      key: dse.trap.type
+      delay: '0'
+      history: 90d
+      value_type: UNSIGNED
+      preprocessing:
+      - type: REGEX
+        parameters:
+        - '41385\.1\.1\.1\.1\.1(?:\.\d+)* = (?:\w+: )?\"?([^\"\n]*)'
+        - \1
+        error_handler: DISCARD_VALUE
+      master_item:
+        key: snmptrap["41385\.1\.1\.2"]
+      tags:
+      - tag: component
+        value: trap
+    - uuid: 5c50b7a46dd540f7a929f3f3e8fc3ce6
+      name: 'Trap: subtipo do evento'
+      type: DEPENDENT
+      key: dse.trap.subtype
+      delay: '0'
+      history: 90d
+      value_type: UNSIGNED
+      preprocessing:
+      - type: REGEX
+        parameters:
+        - '41385\.1\.1\.1\.1\.2(?:\.\d+)* = (?:\w+: )?\"?([^\"\n]*)'
+        - \1
+        error_handler: DISCARD_VALUE
+      master_item:
+        key: snmptrap["41385\.1\.1\.2"]
+      tags:
+      - tag: component
+        value: trap
+    - uuid: 89c98ad867804f75bc85937c70fc72ba
+      name: 'Trap: módulo de origem'
+      type: DEPENDENT
+      key: dse.trap.module
+      delay: '0'
+      history: 90d
+      value_type: CHAR
+      preprocessing:
+      - type: REGEX
+        parameters:
+        - '41385\.1\.1\.1\.1\.8(?:\.\d+)* = (?:\w+: )?\"?([^\"\n]*)'
+        - \1
+        error_handler: DISCARD_VALUE
+      master_item:
+        key: snmptrap["41385\.1\.1\.2"]
+      tags:
+      - tag: component
+        value: trap
+    - uuid: 8f87dea482a046e4b59765e9eb63e461
+      name: 'Trap: não reconhecido (fallback)'
+      type: SNMP_TRAP
+      key: snmptrap.fallback
+      value_type: LOG
+      history: 30d
+      description: Traps do DSE892 que não casaram com outro item (coldStart etc.).
+      tags:
+      - tag: component
+        value: trap
+    macros:
+    - macro: '{$DSE.INSTANCE}'
+      value: '1'
+      description: SNMP instance do módulo no DSE892
+    - macro: '{$DSE.MAINS.VMIN}'
+      value: '100'
+      description: Tensão fase-neutro mínima da rede (V)
+    - macro: '{$DSE.GEN.LOAD.AMIN}'
+      value: '5'
+      description: Corrente que indica gerador com carga (A)
+    - macro: '{$DSE.FUEL.LOW}'
+      value: '50'
+    - macro: '{$DSE.FUEL.CRIT}'
+      value: '20'
+    - macro: '{$DSE.FUEL.FULL}'
+      value: '100'
+      description: Leitura do sensor (%) com o tanque cheio. 100 = sem correção
+    - macro: '{$DSE.BATT.MIN}'
+      value: '11'
+    - macro: '{$DSE.COOLANT.MAX}'
+      value: '95'
+    tags:
+    - tag: class
+      value: power
+    - tag: target
+      value: dse892
+    dashboards:
+    - uuid: 5a4d73fdc1264adc9f05757ab2b1643a
+      name: Gerador - visão geral
+      pages:
+      - widgets:
+        - type: painelgerador
+          name: Painel do gerador
+          x: '0'
+          y: '0'
+          width: '72'
+          height: '8'
+        - type: graph
+          name: Tensão de entrada (rede) - 3 fases
+          x: '0'
+          y: '8'
+          width: '36'
+          height: '8'
+          fields:
+          - type: GRAPH
+            name: graphid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              name: Tensão de entrada (rede) - 3 fases
+        - type: graph
+          name: Tensão de saída (gerador) - 3 fases
+          x: '36'
+          y: '8'
+          width: '36'
+          height: '8'
+          fields:
+          - type: GRAPH
+            name: graphid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              name: Tensão de saída (gerador) - 3 fases
+        - type: graph
+          name: Corrente da carga - 3 fases
+          x: '0'
+          y: '16'
+          width: '72'
+          height: '7'
+          fields:
+          - type: GRAPH
+            name: graphid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              name: Corrente da carga - 3 fases
+        - type: item
+          name: Modo do controlador
+          x: '0'
+          y: '23'
+          width: '12'
+          height: '4'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.mode.text
+        - type: item
+          name: Rotação do motor
+          x: '12'
+          y: '23'
+          width: '12'
+          height: '4'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.engine.rpm
+        - type: gauge
+          name: Combustível
+          x: '24'
+          y: '23'
+          width: '12'
+          height: '4'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.fuel.level
+          - type: STRING
+            name: min
+            value: '0'
+          - type: STRING
+            name: max
+            value: '100'
+          - type: STRING
+            name: thresholds.0.color
+            value: E53935
+          - type: STRING
+            name: thresholds.0.threshold
+            value: '0'
+          - type: STRING
+            name: thresholds.1.color
+            value: FFB300
+          - type: STRING
+            name: thresholds.1.threshold
+            value: '20'
+          - type: STRING
+            name: thresholds.2.color
+            value: 43A047
+          - type: STRING
+            name: thresholds.2.threshold
+            value: '50'
+        - type: gauge
+          name: Bateria de partida
+          x: '36'
+          y: '23'
+          width: '12'
+          height: '4'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.battery.volt
+          - type: STRING
+            name: min
+            value: '0'
+          - type: STRING
+            name: max
+            value: '16'
+          - type: STRING
+            name: thresholds.0.color
+            value: E53935
+          - type: STRING
+            name: thresholds.0.threshold
+            value: '0'
+          - type: STRING
+            name: thresholds.1.color
+            value: FFB300
+          - type: STRING
+            name: thresholds.1.threshold
+            value: '11'
+          - type: STRING
+            name: thresholds.2.color
+            value: 43A047
+          - type: STRING
+            name: thresholds.2.threshold
+            value: '12'
+        - type: gauge
+          name: Temperatura do motor
+          x: '48'
+          y: '23'
+          width: '12'
+          height: '4'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.engine.coolant.temp
+          - type: STRING
+            name: min
+            value: '0'
+          - type: STRING
+            name: max
+            value: '120'
+          - type: STRING
+            name: thresholds.0.color
+            value: 43A047
+          - type: STRING
+            name: thresholds.0.threshold
+            value: '0'
+          - type: STRING
+            name: thresholds.1.color
+            value: FFB300
+          - type: STRING
+            name: thresholds.1.threshold
+            value: '85'
+          - type: STRING
+            name: thresholds.2.color
+            value: E53935
+          - type: STRING
+            name: thresholds.2.threshold
+            value: '95'
+        - type: item
+          name: Último evento (trap)
+          x: '60'
+          y: '23'
+          width: '12'
+          height: '4'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.trap.description
+        - type: item
+          name: Frequência da rede
+          x: '0'
+          y: '27'
+          width: '12'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.mains.freq
+        - type: item
+          name: Frequência do gerador
+          x: '12'
+          y: '27'
+          width: '12'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.gen.freq
+        - type: item
+          name: Potência ativa
+          x: '24'
+          y: '27'
+          width: '12'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.gen.power
+        - type: item
+          name: Energia gerada
+          x: '36'
+          y: '27'
+          width: '12'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.gen.kwh
+        - type: item
+          name: Horas de motor
+          x: '48'
+          y: '27'
+          width: '12'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.engine.hours
+        - type: item
+          name: Partidas
+          x: '60'
+          y: '27'
+          width: '12'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.engine.starts
+  triggers:
+  - uuid: 9b2b96feca4f4ff4bc1ffdd1423c6ee4
+    expression: min(/DSE892 Gerador Stemac by SNMP/dse.engine.coolant.temp,3m)>{$DSE.COOLANT.MAX} and last(/DSE892 Gerador Stemac by SNMP/dse.battery.volt)>0
+    name: 'Gerador: temperatura do motor alta (> {$DSE.COOLANT.MAX} °C)'
+    priority: DISASTER
+  - uuid: 908b34dffd004309937a9648e2d73a82
+    expression: last(/DSE892 Gerador Stemac by SNMP/dse.fuel.level)<{$DSE.FUEL.CRIT} and last(/DSE892 Gerador Stemac by SNMP/dse.battery.volt)>0
+    name: 'Gerador: combustível crítico (< {$DSE.FUEL.CRIT}%)'
+    priority: DISASTER
+  - uuid: fed72652e33e44e2803160b283d93f04
+    expression: avg(/DSE892 Gerador Stemac by SNMP/dse.fuel.level,15m)<{$DSE.FUEL.LOW} and last(/DSE892 Gerador Stemac by SNMP/dse.battery.volt)>0
+    name: 'Gerador: combustível baixo (< {$DSE.FUEL.LOW}%)'
+    priority: HIGH
+  - uuid: 67795aa650634eeebbfe0c984b9886cc
+    expression: max(/DSE892 Gerador Stemac by SNMP/dse.battery.volt,10m)<{$DSE.BATT.MIN} and last(/DSE892 Gerador Stemac by SNMP/dse.battery.volt)>0
+    name: 'Gerador: bateria de partida baixa (< {$DSE.BATT.MIN} V)'
+    priority: HIGH
+  - uuid: df53b2da2e8e486a91160b475463fddd
+    expression: (max(/DSE892 Gerador Stemac by SNMP/dse.mains.volt[L1-N],2m)<{$DSE.MAINS.VMIN} or max(/DSE892 Gerador Stemac by SNMP/dse.mains.volt[L2-N],2m)<{$DSE.MAINS.VMIN} or max(/DSE892 Gerador Stemac
+      by SNMP/dse.mains.volt[L3-N],2m)<{$DSE.MAINS.VMIN}) and last(/DSE892 Gerador Stemac by SNMP/dse.battery.volt)>0
+    name: 'Gerador: falta de rede (tensão de entrada < {$DSE.MAINS.VMIN} V)'
+    priority: HIGH
+    recovery_mode: RECOVERY_EXPRESSION
+    recovery_expression: min(/DSE892 Gerador Stemac by SNMP/dse.mains.volt[L1-N],5m)>={$DSE.MAINS.VMIN} and min(/DSE892 Gerador Stemac by SNMP/dse.mains.volt[L2-N],5m)>={$DSE.MAINS.VMIN} and min(/DSE892
+      Gerador Stemac by SNMP/dse.mains.volt[L3-N],5m)>={$DSE.MAINS.VMIN}
+    description: Alguma fase da rede abaixo do mínimo por 2 min.
+  - uuid: 123b51facf1f4a17ae51e273410cb4b9
+    expression: find(/DSE892 Gerador Stemac by SNMP/dse.trap.description,10m,"iregexp","shutdown|electrical trip|parada|desligamento")=1
+    name: 'Gerador: parada por alarme (trap): {ITEM.LASTVALUE1}'
+    priority: DISASTER
+    description: O DSE7320 reportou shutdown/electrical trip por trap. Fechar manualmente após verificar.
+    manual_close: 'YES'
+  - uuid: 9b85ea1e51e544118ca84f637fa8bf33
+    expression: min(/DSE892 Gerador Stemac by SNMP/dse.engine.rpm,2m)>0 and max(/DSE892 Gerador Stemac by SNMP/dse.gen.current[L1],2m)>{$DSE.GEN.LOAD.AMIN}
+    name: 'Gerador: assumiu a carga (gerando com rede em falta)'
+    priority: HIGH
+    recovery_mode: RECOVERY_EXPRESSION
+    recovery_expression: max(/DSE892 Gerador Stemac by SNMP/dse.engine.rpm,5m)=0
+  graphs:
+  - uuid: 2003dad1f3084f319773f5c58db7c84e
+    name: Tensão de entrada (rede) - 3 fases
+    graph_items:
+    - sortorder: '0'
+      color: E53935
+      item:
+        host: DSE892 Gerador Stemac by SNMP
+        key: dse.mains.volt[L1-N]
+    - sortorder: '1'
+      color: 1E88E5
+      item:
+        host: DSE892 Gerador Stemac by SNMP
+        key: dse.mains.volt[L2-N]
+    - sortorder: '2'
+      color: 43A047
+      item:
+        host: DSE892 Gerador Stemac by SNMP
+        key: dse.mains.volt[L3-N]
+  - uuid: 8b145c4946394f4794a7b47066f61772
+    name: Tensão de saída (gerador) - 3 fases
+    graph_items:
+    - sortorder: '0'
+      color: E53935
+      item:
+        host: DSE892 Gerador Stemac by SNMP
+        key: dse.gen.volt[L1-N]
+    - sortorder: '1'
+      color: 1E88E5
+      item:
+        host: DSE892 Gerador Stemac by SNMP
+        key: dse.gen.volt[L2-N]
+    - sortorder: '2'
+      color: 43A047
+      item:
+        host: DSE892 Gerador Stemac by SNMP
+        key: dse.gen.volt[L3-N]
+  - uuid: 0171c5d9808243b58c051bc6c19a5290
+    name: Corrente da carga - 3 fases
+    graph_items:
+    - sortorder: '0'
+      color: E53935
+      item:
+        host: DSE892 Gerador Stemac by SNMP
+        key: dse.gen.current[L1]
+    - sortorder: '1'
+      color: 1E88E5
+      item:
+        host: DSE892 Gerador Stemac by SNMP
+        key: dse.gen.current[L2]
+    - sortorder: '2'
+      color: 43A047
+      item:
+        host: DSE892 Gerador Stemac by SNMP
+        key: dse.gen.current[L3]
