@@ -522,3 +522,12 @@
 .overlay-dialogue.modal:has(#execution-output) .overlay-dialogue-footer button {
 	margin: 0;
 }
+
+/* Ícone e texto na mesma linha: rótulos, legendas, títulos e selos não quebram em telas estreitas. */
+.painel-gerador .pg-rotulo,
+.painel-gerador .pg-medidas > *,
+.painel-gerador .pg-titulo,
+.painel-gerador .pg-subtitulo,
+.painel-gerador .pg-selo {
+	white-space: nowrap;
+}

@@ -491,3 +491,28 @@
 .overlay-dialogue.modal:has(#execution-output) .overlay-dialogue-footer button {
 	margin: 0;
 }
+
+/* Ícone e texto na mesma linha: rótulos, legendas, títulos e selos não quebram em telas estreitas. */
+.gerador-movel .gm-rotulo,
+.gerador-movel .gm-medidas > *,
+.gerador-movel .gm-botao-rotulo,
+.gerador-movel .gm-titulo,
+.gerador-movel .gm-subtitulo,
+.gerador-movel .gm-selo,
+.gerador-movel .gm-segmento,
+.gerador-movel .gm-link,
+.gerador-movel .gm-hora {
+	white-space: nowrap;
+}
+
+/* O badge da fonte é uma frase: pode quebrar. */
+.gerador-movel .gm-badges > .gm-badge {
+	white-space: normal;
+}
+
+/* Sem quebra nos rótulos, a tabela do motor desce para baixo do tanque quando não cabe ao lado. */
+.gerador-movel .gm-motor {
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 12px 20px;
+}
