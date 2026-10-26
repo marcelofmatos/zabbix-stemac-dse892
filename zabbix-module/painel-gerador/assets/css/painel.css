@@ -385,6 +385,15 @@
 	gap: 8px;
 }
 
+.painel-gerador .pg-motivos {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
 .painel-gerador .pg-botoes .pg-botao,
 .painel-gerador .pg-botoes .pg-botao:hover,
 .painel-gerador .pg-botoes .pg-botao:focus,

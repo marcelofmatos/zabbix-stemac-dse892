@@ -61,7 +61,7 @@ class CWidgetPainelGerador extends CWidget {
 			this.#moldura('pg-moldura-controle', '🚦 Estado',
 				this.#modos(estado.modo), this.#alarme(estado.alarme, response),
 				this.#subtitulo('⚙️ Motor'), this.#motor(estado.motor),
-				this.#subtitulo('🎛️ Comandos'), this.#botoes(estado, response)
+				this.#subtitulo('🎛️ Comandos'), ...this.#botoes(estado, response)
 			)
 		);
 		raiz.appendChild(corpo);
@@ -200,8 +200,10 @@ class CWidgetPainelGerador extends CWidget {
 		return bloco;
 	}
 
+	// Grade de botões e, abaixo, os motivos (bloqueio/dica) agrupados, como na página do celular.
 	#botoes(estado, response) {
 		const barra = this.#el('div', 'pg-botoes');
+		const motivos = new Map();
 
 		for (const [cmd, rotulo] of CWidgetPainelGerador.BOTOES) {
 			const botao_estado = estado.botoes[cmd];
@@ -224,6 +226,7 @@ class CWidgetPainelGerador extends CWidget {
 
 			if (botao_estado.dica !== null) {
 				involucro.title = botao_estado.dica;
+				motivos.set(botao_estado.dica, [...(motivos.get(botao_estado.dica) || []), rotulo]);
 			}
 
 			if (botao_estado.travado) {
@@ -244,7 +247,16 @@ class CWidgetPainelGerador extends CWidget {
 			barra.appendChild(involucro);
 		}
 
-		return barra;
+		const lista = this.#el('ul', 'pg-motivos');
+
+		for (const [dica, rotulos] of motivos) {
+			const item = this.#el('li', '');
+
+			item.append(this.#el('strong', '', rotulos.join(', ')), document.createTextNode(`: ${dica}`));
+			lista.appendChild(item);
+		}
+
+		return motivos.size > 0 ? [barra, lista] : [barra];
 	}
 
 	/*
