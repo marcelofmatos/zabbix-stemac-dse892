@@ -5,7 +5,6 @@ Roda o mesmo JS do webhook no node, com HttpRequest falso, e verifica:
 - Auto é BLOQUEADO quando o controlador lê a rede anormal (estado de 2026-10-23);
 - Auto passa com a rede normal;
 - Stop envia o código 35700 sem consultar a rede;
-- confirmação diferente de GERADOR não envia nada.
 
 Uso: python3 test_comandos.py   (precisa de node no PATH)
 """
@@ -23,16 +22,14 @@ NORMAL = {"22": 600, "23": 1270, "24": 1265, "25": 1271}
 
 CASES = [
     # nome, modbus, parâmetros, espera erro (trecho), chamadas esperadas
-    ("auto_bloqueado", ANORMAL, {"button": "35701", "check_mains": "1", "confirm": "GERADOR"},
+    ("auto_bloqueado", ANORMAL, {"button": "35701", "check_mains": "1"},
      "BLOQUEADO", ["co_inst_mod_data.cgi moduleID=0"]),
-    ("auto_liberado", NORMAL, {"button": "35701", "check_mains": "1", "confirm": "GERADOR"},
+    ("auto_liberado", NORMAL, {"button": "35701", "check_mains": "1"},
      None, ["co_inst_mod_data.cgi moduleID=0", "co_inst_button.cgi moduleID=0&button=35701"]),
-    ("stop", ANORMAL, {"button": "35700", "check_mains": "0", "confirm": "GERADOR"},
+    ("stop", ANORMAL, {"button": "35700", "check_mains": "0"},
      None, ["co_inst_button.cgi moduleID=0&button=35700"]),
-    ("confirmacao_errada", NORMAL, {"button": "35700", "check_mains": "0", "confirm": "gerador"},
-     "Confirmação inválida", []),
     # comando bloqueado recusa no servidor (Super admin ignora o grupo de usuários do script)
-    ("partida_bloqueada", NORMAL, {"button": "35705", "check_mains": "0", "confirm": "GERADOR",
+    ("partida_bloqueada", NORMAL, {"button": "35705", "check_mains": "0",
                                    "bloqueio": "controlador com AC Comms Fail"},
      "BLOQUEADO", []),
 ]

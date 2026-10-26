@@ -107,7 +107,7 @@ e `{$DSE.WEB.PASS}` (secreta).
 | 4 - Modo Teste (com carga) | 35703 | Motor parte e assume a carga |
 | 5 - Modo Auto | 35701 | Antes de enviar, lê a rede pelo controlador e recusa se freq. ∉ 55–65 Hz ou L-N < `{$DSE.MAINS.VMIN}` |
 
-- Cada comando pede **confirmação** e exige **digitar `GERADOR`**.
+- Cada comando pede **confirmação** (sim/não) antes de ser enviado.
 - Visíveis só no grupo de hosts **"Gerador - comandos"** e executáveis só pelo grupo de usuários
   **"Operadores do gerador"**. Adicione os operadores a ele.
 - **Bloqueio** (ex.: controlador em manutenção): coloque o nome em `BLOQUEADOS` no script e rode de

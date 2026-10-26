@@ -89,7 +89,7 @@ sequenceDiagram
     participant G as DSE892
     U->>P: toca STOP, MANUAL, AUTO...
     P->>F: Script.execute
-    F->>U: confirmação e digite GERADOR
+    F->>U: janela de confirmação
     U->>F: confirma
     F->>S: executa o webhook se o usuário tiver permissão
     alt comando bloqueado

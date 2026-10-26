@@ -66,9 +66,6 @@ var p = JSON.parse(value);
 if (p.bloqueio) {
     throw 'BLOQUEADO: ' + p.bloqueio;
 }
-if (p.confirm !== 'GERADOR') {
-    throw 'Confirmação inválida: digite GERADOR.';
-}
 var base = p.url.replace(/\/+$/, '');
 var auth = 'Authorization: Basic ' + btoa(p.user + ':' + p.pass);
 
@@ -151,13 +148,12 @@ for label, button, check, warning in COMMANDS:
         "groupid": gid, "usrgrpid": ugid_bloqueado if label in BLOQUEADOS else ugid, "host_access": 3,
         "description": warning,
         "confirmation": f"{warning}\n\nConfirma '{label}' em {{HOST.NAME}}?",
-        "manualinput": 1, "manualinput_prompt": "Digite GERADOR para confirmar",
-        "manualinput_validator_type": 0, "manualinput_validator": "^GERADOR$",
+        "manualinput": 0, "manualinput_prompt": "", "manualinput_validator": "",
         "parameters": [
             {"name": "url", "value": "{$DSE.WEB.URL}"}, {"name": "user", "value": "{$DSE.WEB.USER}"},
             {"name": "pass", "value": "{$DSE.WEB.PASS}"}, {"name": "button", "value": button},
             {"name": "label", "value": label}, {"name": "check_mains", "value": check},
-            {"name": "vmin", "value": "{$DSE.MAINS.VMIN}"}, {"name": "confirm", "value": "{MANUALINPUT}"},
+            {"name": "vmin", "value": "{$DSE.MAINS.VMIN}"},
             {"name": "bloqueio", "value": MOTIVO_BLOQUEIO if label in BLOQUEADOS else ""},
         ],
     }
