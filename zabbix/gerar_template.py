@@ -248,7 +248,7 @@ def abaixo(dy, widgets):
 
 
 RED, YELLOW, GREEN = "E53935", "FFB300", "43A047"
-PAINEL_ALTURA = 8
+PAINEL_ALTURA = 9
 dashboard = {
     "uuid": uid("dashboard"),
     "name": "Gerador - visão geral",

@@ -780,11 +780,11 @@ zabbix_export:
           x: '0'
           y: '0'
           width: '72'
-          height: '8'
+          height: '9'
         - type: graph
           name: Tensão de entrada (rede) - 3 fases
           x: '0'
-          y: '8'
+          y: '9'
           width: '36'
           height: '8'
           fields:
@@ -796,7 +796,7 @@ zabbix_export:
         - type: graph
           name: Tensão de saída (gerador) - 3 fases
           x: '36'
-          y: '8'
+          y: '9'
           width: '36'
           height: '8'
           fields:
@@ -808,7 +808,7 @@ zabbix_export:
         - type: graph
           name: Corrente da carga - 3 fases
           x: '0'
-          y: '16'
+          y: '17'
           width: '72'
           height: '7'
           fields:
@@ -820,7 +820,7 @@ zabbix_export:
         - type: item
           name: Modo do controlador
           x: '0'
-          y: '23'
+          y: '24'
           width: '12'
           height: '4'
           fields:
@@ -832,7 +832,7 @@ zabbix_export:
         - type: item
           name: Rotação do motor
           x: '12'
-          y: '23'
+          y: '24'
           width: '12'
           height: '4'
           fields:
@@ -844,7 +844,7 @@ zabbix_export:
         - type: gauge
           name: Combustível
           x: '24'
-          y: '23'
+          y: '24'
           width: '12'
           height: '4'
           fields:
@@ -880,7 +880,7 @@ zabbix_export:
         - type: gauge
           name: Bateria de partida
           x: '36'
-          y: '23'
+          y: '24'
           width: '12'
           height: '4'
           fields:
@@ -916,7 +916,7 @@ zabbix_export:
         - type: gauge
           name: Temperatura do motor
           x: '48'
-          y: '23'
+          y: '24'
           width: '12'
           height: '4'
           fields:
@@ -952,7 +952,7 @@ zabbix_export:
         - type: item
           name: Último evento (trap)
           x: '60'
-          y: '23'
+          y: '24'
           width: '12'
           height: '4'
           fields:
@@ -964,7 +964,7 @@ zabbix_export:
         - type: item
           name: Frequência da rede
           x: '0'
-          y: '27'
+          y: '28'
           width: '12'
           height: '3'
           fields:
@@ -976,7 +976,7 @@ zabbix_export:
         - type: item
           name: Frequência do gerador
           x: '12'
-          y: '27'
+          y: '28'
           width: '12'
           height: '3'
           fields:
@@ -988,7 +988,7 @@ zabbix_export:
         - type: item
           name: Potência ativa
           x: '24'
-          y: '27'
+          y: '28'
           width: '12'
           height: '3'
           fields:
@@ -1000,7 +1000,7 @@ zabbix_export:
         - type: item
           name: Energia gerada
           x: '36'
-          y: '27'
+          y: '28'
           width: '12'
           height: '3'
           fields:
@@ -1012,7 +1012,7 @@ zabbix_export:
         - type: item
           name: Horas de motor
           x: '48'
-          y: '27'
+          y: '28'
           width: '12'
           height: '3'
           fields:
@@ -1024,7 +1024,7 @@ zabbix_export:
         - type: item
           name: Partidas
           x: '60'
-          y: '27'
+          y: '28'
           width: '12'
           height: '3'
           fields:

@@ -56,8 +56,12 @@
 	opacity: 0.6;
 }
 
+.painel-gerador .pg-moldura-controle {
+	gap: 8px;
+}
+
 .painel-gerador .pg-moldura-controle .pg-subtitulo:not(:first-child) {
-	padding-top: 8px;
+	padding-top: 6px;
 	border-top: 1px solid var(--pg-moldura);
 }
 
@@ -376,11 +380,11 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 5px;
+	gap: 3px;
 	width: 100%;
 	height: auto;
 	margin: 0;
-	padding: 2px 0;
+	padding: 0;
 	border: 0;
 	background: none;
 	box-shadow: none;
