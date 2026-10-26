@@ -10,6 +10,8 @@ Variáveis de ambiente (ou no ../.env, ver ../.env.example):
   ZABBIX_URL    URL do frontend, ex.: https://zabbix.example.com
   ZABBIX_TOKEN  token de API (Super admin)
   ZABBIX_HOST   nome técnico do host do gerador (padrão "Gerador")
+  ZABBIX_CA_FILE  CA para validar o HTTPS do Zabbix (opcional, ex.: CA interna)
+  ZABBIX_INSECURE=1  não valida o certificado (só para teste; expõe o token a MITM)
   DSE_HTTP_URL, DSE_HTTP_USER, DSE_HTTP_PW  acesso web ao DSE892
 """
 import json
@@ -36,7 +38,10 @@ USRGRP_BLOQUEADO = "Gerador - comandos bloqueados"
 # Ex.: BLOQUEADOS = {"3 - Dar partida (requer Manual)", "4 - Modo Teste (com carga)"}
 MOTIVO_BLOQUEIO = "controlador em manutenção: comando bloqueado até o reparo."
 BLOQUEADOS = set()
-CTX = ssl._create_unverified_context()
+if ENV.get("ZABBIX_INSECURE") == "1":
+    CTX = ssl._create_unverified_context()
+else:
+    CTX = ssl.create_default_context(cafile=ENV.get("ZABBIX_CA_FILE") or None)
 
 # Códigos de controle GenComm aceitos pelo DSE892 (lista ControlsAvailable do 7320).
 # 35705 ("start engine if in manual or test mode") NÃO aparece nessa lista: ainda não validado em campo.
