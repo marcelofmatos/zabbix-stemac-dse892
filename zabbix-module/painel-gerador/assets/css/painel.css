@@ -343,32 +343,92 @@
 	gap: 8px;
 }
 
-.painel-gerador .pg-botoes .pg-botao {
+.painel-gerador .pg-botoes .pg-botao,
+.painel-gerador .pg-botoes .pg-botao:hover,
+.painel-gerador .pg-botoes .pg-botao:focus,
+.painel-gerador .pg-botoes .pg-botao:active,
+.painel-gerador .pg-botoes .pg-botao:disabled {
 	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	justify-content: center;
-	gap: 4px;
+	gap: 5px;
 	width: 100%;
-	height: 56px;
-	padding: 6px 4px;
+	height: auto;
+	margin: 0;
+	padding: 2px 0;
+	border: 0;
+	background: none;
+	box-shadow: none;
+	color: inherit;
 	line-height: 1;
+	font-size: 11px;
 	font-weight: bold;
 }
 
-.painel-gerador .pg-botao .pg-icone::before {
-	font-size: 22px;
+/* Tecla redonda de face clara, como no painel do controlador; cores fixas nos dois temas. */
+.painel-gerador .pg-tecla {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 46px;
+	height: 46px;
+	box-sizing: border-box;
+	border: 2px solid #4a4a4a;
+	border-radius: 50%;
+	background: radial-gradient(circle at 35% 30%, #ffffff, #dcdcdc 65%, #b8b8b8);
+	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.35);
 }
 
-.painel-gerador .pg-botao .pg-cadeado {
+.painel-gerador .pg-tecla-icone {
+	width: 26px;
+	height: 26px;
+}
+
+.painel-gerador .pg-botao:not(:disabled) {
+	cursor: pointer;
+}
+
+.painel-gerador .pg-botao:not(:disabled):hover .pg-tecla,
+.painel-gerador .pg-botao:focus-visible .pg-tecla {
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}
+
+.painel-gerador .pg-botao:not(:disabled):active .pg-tecla {
+	transform: translateY(1px);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+}
+
+.painel-gerador .pg-botao:disabled .pg-tecla {
+	box-shadow: none;
+}
+
+.painel-gerador .pg-botao:disabled .pg-tecla-icone {
+	opacity: 0.35;
+}
+
+.painel-gerador .pg-botao:disabled .pg-rotulo {
+	opacity: 0.5;
+}
+
+.painel-gerador .pg-tecla .pg-cadeado {
 	position: absolute;
-	top: 3px;
-	right: 3px;
+	top: -5px;
+	right: -7px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background-color: #4a4a4a;
+	color: #ffffff;
 }
 
-.painel-gerador .pg-botao .pg-cadeado::before {
-	font-size: 14px;
+.painel-gerador .pg-tecla .pg-cadeado::before {
+	font-size: 12px;
 }
 
 /* Celular (widget estreito): alvos de toque maiores e grade usando a largura do bloco. */
@@ -386,7 +446,16 @@
 	}
 
 	.painel-gerador .pg-botoes .pg-botao {
-		height: 64px;
 		font-size: 13px;
+	}
+
+	.painel-gerador .pg-tecla {
+		width: 56px;
+		height: 56px;
+	}
+
+	.painel-gerador .pg-tecla-icone {
+		width: 30px;
+		height: 30px;
 	}
 }

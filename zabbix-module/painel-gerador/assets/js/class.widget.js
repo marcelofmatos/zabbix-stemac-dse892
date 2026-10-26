@@ -3,13 +3,13 @@ class CWidgetPainelGerador extends CWidget {
 	static ATUALIZAR_APOS_DIALOGOS_S = 2;
 	static VERIFICAR_DIALOGOS_MS = 500;
 
-	// Comando, rótulo e ícone da fonte do Zabbix (zi-*). Grade de 3: modos na 1ª linha, motor na 2ª.
+	// Comando e rótulo; o símbolo vem de #iconeTecla. Grade de 3: modos na 1ª linha, motor na 2ª.
 	static BOTOES = [
-		['stop', 'STOP', 'zi-stop-sign'],
-		['manual', 'MANUAL', 'zi-wrench'],
-		['auto', 'AUTO', 'zi-reload'],
-		['partida', 'PARTIDA', 'zi-play'],
-		['teste', 'TESTE', 'zi-check']
+		['stop', 'STOP'],
+		['manual', 'MANUAL'],
+		['auto', 'AUTO'],
+		['partida', 'PARTIDA'],
+		['teste', 'TESTE']
 	];
 
 	static MODOS = [
@@ -177,7 +177,7 @@ class CWidgetPainelGerador extends CWidget {
 	#botoes(estado, response) {
 		const barra = this.#el('div', 'pg-botoes');
 
-		for (const [cmd, rotulo, icone] of CWidgetPainelGerador.BOTOES) {
+		for (const [cmd, rotulo] of CWidgetPainelGerador.BOTOES) {
 			const botao_estado = estado.botoes[cmd];
 
 			if (!botao_estado.visivel) {
@@ -189,7 +189,10 @@ class CWidgetPainelGerador extends CWidget {
 			const involucro = this.#el('span', '');
 			const botao = this.#el('button', 'pg-botao');
 
-			botao.append(this.#el('span', `pg-icone ${icone}`), this.#el('span', 'pg-rotulo', rotulo));
+			const tecla = this.#el('span', 'pg-tecla');
+
+			tecla.appendChild(this.#iconeTecla(cmd));
+			botao.append(tecla, this.#el('span', 'pg-rotulo', rotulo));
 			botao.type = 'button';
 			botao.disabled = !botao_estado.habilitado;
 
@@ -198,7 +201,7 @@ class CWidgetPainelGerador extends CWidget {
 			}
 
 			if (botao_estado.travado) {
-				botao.appendChild(this.#el('span', 'pg-cadeado zi-lock'));
+				tecla.appendChild(this.#el('span', 'pg-cadeado zi-lock'));
 			}
 
 			botao.addEventListener('click', () => {
@@ -370,6 +373,60 @@ class CWidgetPainelGerador extends CWidget {
 			this.#svg('line', {x1: 7, y1: 12, x2: 10, y2: 12}),
 			this.#svg('line', {x1: 7, y1: 18, x2: 10, y2: 18})
 		);
+
+		return svg;
+	}
+
+	// Símbolo da tecla, como no painel do controlador (cores fixas: a face da tecla é sempre clara).
+	// A mão é o "pointer" do Lucide (ISC).
+	#iconeTecla(cmd) {
+		const svg = this.#svg('svg', {class: 'pg-tecla-icone', viewBox: '0 0 24 24', fill: 'none',
+			'stroke-linecap': 'round', 'stroke-linejoin': 'round'
+		});
+		const traco = {stroke: '#333333', 'stroke-width': 1.8};
+
+		switch (cmd) {
+			case 'stop':
+				svg.append(this.#svg('circle', {cx: 12, cy: 12, r: 11, fill: '#d32f2f'}),
+					this.#svg('circle', {cx: 12, cy: 12, r: 5, stroke: '#ffffff', 'stroke-width': 2.5})
+				);
+				break;
+
+			case 'partida':
+				svg.append(this.#svg('circle', {cx: 12, cy: 12, r: 11, fill: '#1e7d4f'}),
+					this.#svg('line', {x1: 12, y1: 6.5, x2: 12, y2: 17.5, stroke: '#ffffff', 'stroke-width': 2.5})
+				);
+				break;
+
+			case 'manual':
+				svg.append(...[
+					'M22 14a8 8 0 0 1-8 8',
+					'M18 11v-1a2 2 0 0 0-2-2a2 2 0 0 0-2 2',
+					'M14 10V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v1',
+					'M10 9.5V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v10',
+					'M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15'
+				].map(d => this.#svg('path', {d, ...traco})));
+				break;
+
+			case 'auto': {
+				const texto = this.#svg('text', {x: 12, y: 14.4, 'text-anchor': 'middle', fill: '#333333',
+					'font-size': 6.5, 'font-weight': 'bold'
+				});
+
+				texto.textContent = 'AUTO';
+				svg.append(this.#svg('rect', {x: 1.5, y: 7, width: 21, height: 10, rx: 1.5, ...traco}), texto);
+				break;
+			}
+
+			case 'teste':
+				// Torre de transmissão riscada: teste com carga.
+				svg.append(
+					this.#svg('path', {d: 'M12 4.5 8.5 19.5M12 4.5l3.5 15M7.5 8h9M9.5 12.5h5M9 16l6-3.5', ...traco}),
+					this.#svg('circle', {cx: 12, cy: 12, r: 10.5, stroke: '#d32f2f', 'stroke-width': 2}),
+					this.#svg('line', {x1: 4.6, y1: 4.6, x2: 19.4, y2: 19.4, stroke: '#d32f2f', 'stroke-width': 2})
+				);
+				break;
+		}
 
 		return svg;
 	}
