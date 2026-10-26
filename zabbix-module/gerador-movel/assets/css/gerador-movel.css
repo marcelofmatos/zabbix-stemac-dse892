@@ -108,15 +108,24 @@
 	gap: 8px;
 }
 
-/* O tema fixa height: 16px nos rótulos status-*; aqui eles são maiores. */
+/* O tema fixa height: 16px, borda e cor de texto escura nas classes de severidade; aqui os dois badges ficam iguais. */
 .gerador-movel .gm-badges > .gm-badge {
 	height: auto;
 	padding: 4px 12px;
+	border: 0;
 	border-radius: 12px;
 	line-height: normal;
+	color: #ffffff;
 	font-size: 14px;
 	font-weight: bold;
 	text-align: center;
+	text-decoration: none;
+}
+
+.gerador-movel .gm-badges > a.gm-badge:hover,
+.gerador-movel .gm-badges > a.gm-badge:focus {
+	color: #ffffff;
+	filter: brightness(0.9);
 }
 
 .gerador-movel .gm-valor > span {

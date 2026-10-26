@@ -226,9 +226,19 @@ class CGeradorMovel {
 			return this.#el('span', 'gm-badge status-green', 'Sem problemas');
 		}
 
-		return this.#el('span', `gm-badge ${severidades[severidade].classe}`,
-			`${severidades[severidade].nome} · ${total} ${total === 1 ? 'problema' : 'problemas'}`
+		// Link para os mesmos problemas: os do host, incluindo suprimidos (a contagem também os inclui).
+		const link = this.#el('a', `gm-badge ${severidades[severidade].classe}`,
+			`${severidades[severidade].nome} · ${total} ${total === 1 ? 'problema' : 'problemas'} ›`
 		);
+		const url = new URL('zabbix.php', location.href);
+
+		url.searchParams.set('action', 'problem.view');
+		url.searchParams.set('filter_set', 1);
+		url.searchParams.set('hostids[]', this.#hostid);
+		url.searchParams.set('show_suppressed', 1);
+		link.setAttribute('href', url.href);
+
+		return link;
 	}
 
 	// Sem desenho de barramento: o selo indica a fonte (vermelho se a fonte estimada for a rede anormal).
