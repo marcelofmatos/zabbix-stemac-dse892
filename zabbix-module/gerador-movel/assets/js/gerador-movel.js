@@ -165,12 +165,17 @@ class CGeradorMovel {
 			));
 		}
 
-		// Estado logo acima dos comandos, como no painel: o modo atual fica junto das teclas que o mudam.
+		// Um cartão só, como a coluna de controle do painel: o modo atual fica junto das teclas que o mudam.
+		const controle = this.#secao('⚙️ Motor', this.#motor(estado.motor),
+			this.#el('h2', 'gm-subtitulo', '🚦 Estado'), this.#modos(estado.modo),
+			this.#badges(estado, resposta.severidades),
+			this.#el('h2', 'gm-subtitulo', '🎛️ Comandos'), ...this.#botoes(estado, resposta)
+		);
+
+		controle.classList.add('gm-controle');
 		itens.push(
 			this.#unifilar(estado),
-			this.#secao('⚙️ Motor', this.#motor(estado.motor)),
-			this.#secao('🚦 Estado', this.#modos(estado.modo), this.#badges(estado, resposta.severidades)),
-			this.#secao('🎛️ Comandos', ...this.#botoes(estado, resposta))
+			controle
 		);
 
 		this.#conteudo.replaceChildren(...itens);

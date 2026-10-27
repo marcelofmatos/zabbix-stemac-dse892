@@ -75,6 +75,13 @@
 	opacity: 0.65;
 }
 
+/* Motor, Estado e Comandos no mesmo cartão, separados por linha como no painel. */
+.gerador-movel .gm-controle .gm-subtitulo:not(:first-child) {
+	margin-top: 4px;
+	padding-top: 10px;
+	border-top: 1px solid var(--gm-moldura);
+}
+
 .gerador-movel .gm-segmentado {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
