@@ -58,9 +58,9 @@ class CWidgetPainelGerador extends CWidget {
 		cabecalho_diagrama.append(this.#subtitulo('🔌 Diagrama'), this.#linkMovel(response.hostid));
 		corpo.append(
 			this.#moldura('pg-moldura-diagrama', cabecalho_diagrama, this.#diagrama(estado)),
-			this.#moldura('pg-moldura-controle', '🚦 Estado',
-				this.#modos(estado.modo), this.#alarme(estado.alarme, response),
-				this.#subtitulo('⚙️ Motor'), this.#motor(estado.motor),
+			// Estado logo acima dos comandos: o modo atual fica junto das teclas que o mudam.
+			this.#moldura('pg-moldura-controle', '⚙️ Motor', this.#motor(estado.motor),
+				this.#subtitulo('🚦 Estado'), this.#modos(estado.modo), this.#alarme(estado.alarme, response),
 				this.#subtitulo('🎛️ Comandos'), ...this.#botoes(estado, response)
 			)
 		);
