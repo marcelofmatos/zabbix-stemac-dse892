@@ -165,11 +165,11 @@ class CGeradorMovel {
 			));
 		}
 
+		// Estado logo acima dos comandos, como no painel: o modo atual fica junto das teclas que o mudam.
 		itens.push(
-			this.#secao('🚦 Estado', this.#modos(estado.modo), this.#badges(estado, resposta.severidades)
-			),
 			this.#unifilar(estado),
 			this.#secao('⚙️ Motor', this.#motor(estado.motor)),
+			this.#secao('🚦 Estado', this.#modos(estado.modo), this.#badges(estado, resposta.severidades)),
 			this.#secao('🎛️ Comandos', ...this.#botoes(estado, resposta))
 		);
 
