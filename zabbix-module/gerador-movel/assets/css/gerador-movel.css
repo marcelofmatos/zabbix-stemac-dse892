@@ -62,7 +62,8 @@
 	gap: 10px;
 	min-width: 0;
 	padding: 10px 12px 12px;
-	border: 1px solid var(--gm-moldura);
+	/* Mesma borda cinza grossa em todos os cartões (diagrama e seções). */
+	border: 2px solid var(--gm-borda);
 	border-radius: 8px;
 }
 
@@ -160,11 +161,6 @@
 
 .gerador-movel .gm-selo-neutro {
 	background-color: #808080;
-}
-
-.gerador-movel .gm-cartao {
-	border-width: 2px;
-	border-color: var(--gm-borda);
 }
 
 .gerador-movel .gm-cartao.gm-ativo {
