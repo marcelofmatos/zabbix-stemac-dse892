@@ -14,6 +14,21 @@ Monitoramento e operação no **Zabbix 7.0** de um grupo gerador (Stemac ou outr
 
 Arquitetura e fluxos com diagramas: [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md).
 
+## Telas
+
+**Painel do gerador** (widget na dashboard do host): diagrama unifilar à esquerda; motor, estado e comandos
+à direita. Botões desabilitados mostram o motivo logo abaixo das teclas.
+
+![Painel do gerador na dashboard do host](docs/img/painel.png)
+
+**Gerador (celular)**: o mesmo conteúdo em coluna única, com o diagrama na vertical e, abaixo, motor,
+estado e comandos num só cartão (seguidos dos gráficos de 6 h).
+
+<p>
+  <img src="docs/img/celular-diagrama.png" alt="Página do celular: diagrama rede, carga e gerador" width="300">
+  <img src="docs/img/celular-controle.png" alt="Página do celular: motor, estado e comandos" width="300">
+</p>
+
 > ⚠️ **Os comandos ligam, desligam e trocam o modo de um gerador real.** Teste com alguém no
 > local, restrinja o grupo de usuários e use por sua conta e risco.
 
