@@ -40,6 +40,11 @@ jobs:
       - name: 🧪 Webhooks dos comandos (Python + Node)
         run: python3 zabbix/test_comandos.py
 
+      - name: 🧪 Alarme do controlador (JavaScript do trap)
+        run: |
+          pip install --quiet pyyaml
+          python3 zabbix/test_trap_alarme.py
+
       - name: 🧪 Parser do widget Atalhos (PHP em container)
         run: zabbix-module/tests/run_atalhos.sh
 

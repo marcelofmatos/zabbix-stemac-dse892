@@ -736,6 +736,25 @@ zabbix_export:
       tags:
       - tag: component
         value: trap
+    - uuid: e23efc9541fd41bf99f3e145a8c5dc32
+      name: 'Trap: alarme ativo do controlador'
+      type: DEPENDENT
+      key: dse.trap.alarm
+      delay: '0'
+      history: 90d
+      value_type: CHAR
+      description: Texto do último alarme (evento tipo 12) até o reset; vazio depois de Stop/Restart.
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - "function campo(col) {\n    var m = value.match(new RegExp('41385\\\\.1\\\\.1\\\\.1\\\\.1\\\\.' + col + '(?:\\\\.\\\\d+)* = (?:\\\\w+: )?\"?([^\"\\\\n]*)'));\n    return m ? m[1].replace(/\\s+$/,\
+          \ '') : '';\n}\nvar desc = campo(6);\nif (campo(1) === '12' && !/manuten/i.test(desc)) {\n    return desc;\n}\nif (/^(stop mode|restart)$/i.test(desc)) {\n    return '';\n}\nthrow 'trap sem alarme';"
+        error_handler: DISCARD_VALUE
+      master_item:
+        key: snmptrap["41385\.1\.1\.2"]
+      tags:
+      - tag: component
+        value: trap
     - uuid: 8f87dea482a046e4b59765e9eb63e461
       name: 'Trap: não reconhecido (fallback)'
       type: SNMP_TRAP
@@ -1068,11 +1087,27 @@ zabbix_export:
     recovery_expression: min(/DSE892 Gerador Stemac by SNMP/dse.mains.volt[L1-N],5m)>={$DSE.MAINS.VMIN} and min(/DSE892 Gerador Stemac by SNMP/dse.mains.volt[L2-N],5m)>={$DSE.MAINS.VMIN} and min(/DSE892
       Gerador Stemac by SNMP/dse.mains.volt[L3-N],5m)>={$DSE.MAINS.VMIN}
     description: Alguma fase da rede abaixo do mínimo por 2 min.
+  - uuid: 1d91664b43064d3db7c3e6d4dd49d189
+    expression: find(/DSE892 Gerador Stemac by SNMP/dse.trap.description,#1,"iregexp","shutdown|electrical trip|parada|desligamento")=1 and count(/DSE892 Gerador Stemac by SNMP/dse.trap.alarm,10m,"regexp",".")>0
+    name: 'Gerador: parada por alarme: {ITEM.LASTVALUE2}'
+    priority: DISASTER
+    recovery_mode: RECOVERY_EXPRESSION
+    recovery_expression: find(/DSE892 Gerador Stemac by SNMP/dse.trap.description,#1,"iregexp","^(stop mode|restart)$")=1
+    description: O DSE7320 desligou o gerador por alarme (trap). Verificar a causa no local e resetar o controlador (Stop) antes de voltar para Auto.
+    manual_close: 'YES'
   - uuid: 123b51facf1f4a17ae51e273410cb4b9
-    expression: find(/DSE892 Gerador Stemac by SNMP/dse.trap.description,10m,"iregexp","shutdown|electrical trip|parada|desligamento")=1
+    expression: find(/DSE892 Gerador Stemac by SNMP/dse.trap.description,#1,"iregexp","shutdown|electrical trip|parada|desligamento")=1 and count(/DSE892 Gerador Stemac by SNMP/dse.trap.alarm,10m,"regexp",".")=0
     name: 'Gerador: parada por alarme (trap): {ITEM.LASTVALUE1}'
     priority: DISASTER
+    recovery_mode: RECOVERY_EXPRESSION
+    recovery_expression: find(/DSE892 Gerador Stemac by SNMP/dse.trap.description,#1,"iregexp","^(stop mode|restart)$")=1
     description: O DSE7320 reportou shutdown/electrical trip por trap. Fechar manualmente após verificar.
+    manual_close: 'YES'
+  - uuid: e2f9b553c1914ce29a7979a5829eb961
+    expression: length(last(/DSE892 Gerador Stemac by SNMP/dse.trap.alarm))>0
+    name: 'Gerador: alarme do controlador: {ITEM.LASTVALUE1}'
+    priority: HIGH
+    description: 'Alarme configurado no DSE7320 (ex.: entrada de defeito de um equipamento). Fica ativo até o reset do controlador (Stop); se o alarme já sumiu sem reset, fechar à mão.'
     manual_close: 'YES'
   - uuid: 9b85ea1e51e544118ca84f637fa8bf33
     expression: min(/DSE892 Gerador Stemac by SNMP/dse.engine.rpm,2m)>0 and max(/DSE892 Gerador Stemac by SNMP/dse.gen.current[L1],2m)>{$DSE.GEN.LOAD.AMIN}

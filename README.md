@@ -5,7 +5,7 @@ Monitoramento e operação no **Zabbix 7.0** de um grupo gerador (Stemac ou outr
 
 | Componente | Pasta | O que faz |
 |---|---|---|
-| Template `DSE892 Gerador Stemac by SNMP` | [`zabbix/`](zabbix/) | 37 itens (rede, gerador, motor, modo, traps), 12 triggers, 3 gráficos e dashboard do host |
+| Template `DSE892 Gerador Stemac by SNMP` | [`zabbix/`](zabbix/) | 38 itens (rede, gerador, motor, modo, traps), 14 triggers, 3 gráficos e dashboard do host |
 | Comandos do controlador | [`zabbix/criar_comandos.py`](zabbix/criar_comandos.py) | Scripts Webhook Stop / Manual / Partida / Teste / Auto, com confirmação e grupo restrito |
 | Widget **Painel do gerador** | [`zabbix-module/painel-gerador/`](zabbix-module/painel-gerador/) | Diagrama unifilar, modo, alarme, motor, tanque e botões de comando |
 | Página **Gerador (celular)** | [`zabbix-module/gerador-movel/`](zabbix-module/gerador-movel/) | O mesmo painel em coluna única para celular, com gráficos |
@@ -91,13 +91,23 @@ Vincule-o a um host com **interface SNMP v2c** apontando para o DSE892 e defina 
 | `{$DSE.BATT.MIN}` | 11 | Bateria de partida mínima (V) |
 | `{$DSE.COOLANT.MAX}` | 95 | Temperatura máxima do motor (°C) |
 
-**Triggers:** temperatura alta e combustível crítico (Desastre); combustível baixo, bateria baixa,
-falta de rede, gerador assumiu a carga, controlador fora do Auto, gateway sem SNMP e DSE892 sem
+**Triggers:** temperatura alta, combustível crítico e parada por alarme (Desastre); combustível baixo, bateria baixa,
+alarme do controlador, falta de rede, gerador assumiu a carga, controlador fora do Auto, gateway sem SNMP e DSE892 sem
 leitura do controlador (Alta); motor em funcionamento (Atenção); gateway reiniciou (Info).
 
 **Traps sem ruído:** o DSE892 manda trap em **todo** evento (troca de modo, teste semanal...). Só a
-parada por alarme (`shutdown`, `electrical trip`...) vira problema (Desastre). O resto fica no
-histórico dos itens `Trap: *`. O receptor não precisa da MIB: as regex usam os OIDs numéricos.
+parada por alarme (`shutdown`, `electrical trip`...) e os alarmes do controlador viram problema. O resto fica no
+histórico dos itens `Trap: *`.
+
+**Alarmes do controlador:** o item `dse.trap.alarm` guarda o texto do último alarme (evento tipo 12, o texto
+configurado no DSE7320, ex.: *Defeito no Retificador*) até o reset (trap *Stop Mode* ou *Restart*), quando fica vazio.
+Avisos de *Manutenção* ficam de fora. Daí saem três triggers, que fecham no reset ou à mão:
+
+| Severidade | Trigger |
+|---|---|
+| Alta | *Gerador: alarme do controlador: texto*, mesmo sem parada |
+| Desastre | *Gerador: parada por alarme: texto*: trap de parada com alarme nos 10 min anteriores (o nome traz a causa) |
+| Desastre | *Gerador: parada por alarme (trap): Shutdown*: parada sem alarme anterior | O receptor não precisa da MIB: as regex usam os OIDs numéricos.
 
 **Valores ausentes:** sentinelas GenComm (≥ `0x7FFFFFF8`) são descartadas. Quando o DSE892 não tem o
 valor (sensor ausente ou RS485 caído), responde `NULL`, que o Zabbix grava como **0**. Por isso as
@@ -109,6 +119,7 @@ triggers do controlador têm a guarda `last(bateria) > 0`, e a perda de leitura 
 cp .env.example .env   # preencha ZABBIX_URL, ZABBIX_TOKEN, ZABBIX_HOST e o acesso web ao DSE892
 python3 zabbix/criar_comandos.py      # idempotente
 python3 zabbix/test_comandos.py       # testa a lógica dos webhooks, sem tocar no equipamento
+python3 zabbix/test_trap_alarme.py    # testa o JavaScript do alarme do controlador (node)
 ```
 
 Cria scripts **Webhook**, que rodam no Zabbix server e fazem `POST co_inst_button.cgi` no DSE892 (o

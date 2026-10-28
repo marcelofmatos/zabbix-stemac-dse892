@@ -170,13 +170,39 @@ items.append({
     "key": TRAP_KEY, "value_type": "LOG", "history": "90d",
     "description": "Trap dseEventTrap (.1.3.6.1.4.1.41385.1.1.2.1) com a eventEntry nos varbinds.",
     # Sem trigger genérica: o DSE manda trap em todo evento (troca de modo, partida, teste)
-    # e o polling já cobre rede/motor/modo. Só a parada por alarme vira problema.
+    # e o polling já cobre rede/motor/modo. Só a parada e os alarmes do controlador viram problema.
     "tags": [{"tag": "component", "value": "trap"}],
 })
 items.append(trap_field(6, "dse.trap.description", "Trap: descrição do evento"))
 items.append(trap_field(1, "dse.trap.type", "Trap: tipo do evento", "UNSIGNED"))
 items.append(trap_field(2, "dse.trap.subtype", "Trap: subtipo do evento", "UNSIGNED"))
 items.append(trap_field(8, "dse.trap.module", "Trap: módulo de origem"))
+# Alarme do controlador (evento tipo 12, texto configurado no DSE7320, ex.: "Defeito no Retificador").
+# O texto vazio marca o reset (Stop/Restart), que é quando o DSE limpa os alarmes travados.
+# "Manutenção" (aviso de manutenção programada) não conta como alarme.
+TRAP_ALARME_JS = r"""
+function campo(col) {
+    var m = value.match(new RegExp('41385\\.1\\.1\\.1\\.1\\.' + col + '(?:\\.\\d+)* = (?:\\w+: )?"?([^"\\n]*)'));
+    return m ? m[1].replace(/\s+$/, '') : '';
+}
+var desc = campo(6);
+if (campo(1) === '12' && !/manuten/i.test(desc)) {
+    return desc;
+}
+if (/^(stop mode|restart)$/i.test(desc)) {
+    return '';
+}
+throw 'trap sem alarme';
+"""
+items.append({
+    "uuid": uid("dse.trap.alarm"), "name": "Trap: alarme ativo do controlador", "type": "DEPENDENT",
+    "key": "dse.trap.alarm", "delay": "0", "history": "90d", "value_type": "CHAR",
+    "description": "Texto do último alarme (evento tipo 12) até o reset; vazio depois de Stop/Restart.",
+    "preprocessing": [{"type": "JAVASCRIPT", "parameters": [TRAP_ALARME_JS.strip()],
+                       "error_handler": "DISCARD_VALUE"}],
+    "master_item": {"key": TRAP_KEY},
+    "tags": [{"tag": "component", "value": "trap"}],
+})
 items.append({
     "uuid": uid("snmptrap.fallback"), "name": "Trap: não reconhecido (fallback)", "type": "SNMP_TRAP",
     "key": "snmptrap.fallback", "value_type": "LOG", "history": "30d",
@@ -187,6 +213,9 @@ items.append({
 # Com o RS485 caído o DSE892 devolve NULL (gravado como 0): sem esta guarda, a perda de
 # comunicação viraria "combustível crítico", "falta de rede" etc.
 LINK_OK = f"last({k('dse.battery.volt')})>0"
+
+PARADA = f"find({k('dse.trap.description')},#1,\"iregexp\",\"shutdown|electrical trip|parada|desligamento\")=1"
+RESET = f"find({k('dse.trap.description')},#1,\"iregexp\",\"^(stop mode|restart)$\")=1"
 
 top_triggers = [
     trig("Gerador: temperatura do motor alta (> {$DSE.COOLANT.MAX} °C)",
@@ -202,9 +231,22 @@ top_triggers = [
                            for p in ("L1-N", "L2-N", "L3-N")) + f") and {LINK_OK}",
          "HIGH", "Alguma fase da rede abaixo do mínimo por 2 min.",
          " and ".join(f"min({k(f'dse.mains.volt[{p}]')},5m)>={{$DSE.MAINS.VMIN}}" for p in ("L1-N", "L2-N", "L3-N"))),
+    # Parada: com alarme nos 10 min anteriores o nome traz a causa; sem alarme, só o texto do trap.
+    # Fecham no reset (Stop/Restart) ou à mão.
+    {**trig("Gerador: parada por alarme: {ITEM.LASTVALUE2}",
+            f"{PARADA} and count({k('dse.trap.alarm')},10m,\"regexp\",\".\")>0",
+            "DISASTER", "O DSE7320 desligou o gerador por alarme (trap). Verificar a causa no local e "
+                        "resetar o controlador (Stop) antes de voltar para Auto.", RESET),
+     "manual_close": "YES"},
     {**trig("Gerador: parada por alarme (trap): {ITEM.LASTVALUE1}",
-            f"find({k('dse.trap.description')},10m,\"iregexp\",\"shutdown|electrical trip|parada|desligamento\")=1",
-            "DISASTER", "O DSE7320 reportou shutdown/electrical trip por trap. Fechar manualmente após verificar."),
+            f"{PARADA} and count({k('dse.trap.alarm')},10m,\"regexp\",\".\")=0",
+            "DISASTER", "O DSE7320 reportou shutdown/electrical trip por trap. Fechar manualmente após verificar.",
+            RESET),
+     "manual_close": "YES"},
+    {**trig("Gerador: alarme do controlador: {ITEM.LASTVALUE1}",
+            f"length(last({k('dse.trap.alarm')}))>0", "HIGH",
+            "Alarme configurado no DSE7320 (ex.: entrada de defeito de um equipamento). Fica ativo até o "
+            "reset do controlador (Stop); se o alarme já sumiu sem reset, fechar à mão."),
      "manual_close": "YES"},
     trig("Gerador: assumiu a carga (gerando com rede em falta)",
          f"min({k('dse.engine.rpm')},2m)>0 and max({k('dse.gen.current[L1]')},2m)>{{$DSE.GEN.LOAD.AMIN}}",
