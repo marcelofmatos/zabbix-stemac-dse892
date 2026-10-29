@@ -515,7 +515,7 @@ zabbix_export:
       type: SNMP_AGENT
       snmp_oid: .1.3.6.1.4.1.41385.1.3.1.1.5.{$DSE.INSTANCE}
       key: dse.battery.volt
-      delay: 1m
+      delay: 20s
       history: 90d
       value_type: FLOAT
       units: V
@@ -531,12 +531,6 @@ zabbix_export:
       tags:
       - tag: component
         value: motor
-      triggers:
-      - uuid: cbd7c8b0214a4e7c966d089d8f12c4e0
-        expression: max(/DSE892 Gerador Stemac by SNMP/dse.battery.volt,3m)=0
-        name: 'Gerador: DSE892 sem leitura do controlador'
-        priority: HIGH
-        description: 'Bateria lida como 0: o DSE892 perdeu o DSE7320 (RS485) e devolve NULL, que o Zabbix grava como 0. Demais triggers do controlador ficam suspensas.'
     - uuid: 974e1c06306747b1afda33eb581b4086
       name: 'Motor: rotação'
       type: SNMP_AGENT
@@ -787,6 +781,12 @@ zabbix_export:
       description: Leitura do sensor (%) com o tanque vazio. 0 = sem correção
     - macro: '{$DSE.BATT.MIN}'
       value: '11'
+    - macro: '{$DSE.BATT.WARN}'
+      value: '12.2'
+      description: 'Abaixo disto por 30 min: bateria descarregando (carregador parado)'
+    - macro: '{$DSE.BATT.MAX}'
+      value: '15'
+      description: 'Acima disto por 10 min: carregador sobrecarregando a bateria'
     - macro: '{$DSE.COOLANT.MAX}'
       value: '95'
     tags:
@@ -796,19 +796,129 @@ zabbix_export:
       value: dse892
     dashboards:
     - uuid: 5a4d73fdc1264adc9f05757ab2b1643a
-      name: Gerador - visão geral
+      name: Visão geral
       pages:
       - widgets:
         - type: painelgerador
           name: Painel do gerador
           x: '0'
           y: '0'
-          width: '72'
+          width: '44'
           height: '9'
           fields:
           - type: INTEGER
             name: rf_rate
             value: '10'
+        - type: item
+          name: Último evento (trap)
+          x: '44'
+          y: '0'
+          width: '28'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.trap.description
+          - type: INTEGER
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: show.1
+            value: '3'
+          - type: INTEGER
+            name: value_size
+            value: '30'
+        - type: item
+          name: Energia gerada
+          x: '44'
+          y: '3'
+          width: '14'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.gen.kwh
+          - type: INTEGER
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: show.1
+            value: '3'
+        - type: item
+          name: Potência aparente
+          x: '58'
+          y: '3'
+          width: '14'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.gen.va
+          - type: INTEGER
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: show.1
+            value: '3'
+        - type: item
+          name: Fator de potência
+          x: '44'
+          y: '6'
+          width: '14'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.gen.pf
+          - type: INTEGER
+            name: show.0
+            value: '1'
+          - type: INTEGER
+            name: show.1
+            value: '2'
+          - type: INTEGER
+            name: show.2
+            value: '3'
+          - type: INTEGER
+            name: value_size
+            value: '22'
+          - type: STRING
+            name: description
+            value: 'Potência útil ÷ total (0 a 1), ideal ≥ 0,9
+
+              Só tem valor com o gerador em carga'
+          - type: INTEGER
+            name: desc_size
+            value: '9'
+        - type: item
+          name: Gateway DSE892 ligado há
+          x: '58'
+          y: '6'
+          width: '14'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: DSE892 Gerador Stemac by SNMP
+              key: dse.gw.uptime
+          - type: INTEGER
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: show.1
+            value: '3'
+          - type: INTEGER
+            name: value_size
+            value: '22'
         - type: graph
           name: Tensão de entrada (rede) - 3 fases
           x: '0'
@@ -845,223 +955,53 @@ zabbix_export:
             value:
               host: DSE892 Gerador Stemac by SNMP
               name: Corrente da carga - 3 fases
-        - type: item
-          name: Modo do controlador
+        - type: itemhistory
+          name: Eventos do gerador (traps)
           x: '0'
           y: '24'
-          width: '12'
-          height: '4'
+          width: '72'
+          height: '8'
           fields:
           - type: ITEM
-            name: itemid.0
-            value:
-              host: DSE892 Gerador Stemac by SNMP
-              key: dse.mode.text
-        - type: item
-          name: Rotação do motor
-          x: '12'
-          y: '24'
-          width: '12'
-          height: '4'
-          fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: DSE892 Gerador Stemac by SNMP
-              key: dse.engine.rpm
-        - type: gauge
-          name: Combustível
-          x: '24'
-          y: '24'
-          width: '12'
-          height: '4'
-          fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: DSE892 Gerador Stemac by SNMP
-              key: dse.fuel.level
-          - type: STRING
-            name: min
-            value: '0'
-          - type: STRING
-            name: max
-            value: '100'
-          - type: STRING
-            name: thresholds.0.color
-            value: E53935
-          - type: STRING
-            name: thresholds.0.threshold
-            value: '0'
-          - type: STRING
-            name: thresholds.1.color
-            value: FFB300
-          - type: STRING
-            name: thresholds.1.threshold
-            value: '20'
-          - type: STRING
-            name: thresholds.2.color
-            value: 43A047
-          - type: STRING
-            name: thresholds.2.threshold
-            value: '50'
-        - type: gauge
-          name: Bateria de partida
-          x: '36'
-          y: '24'
-          width: '12'
-          height: '4'
-          fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: DSE892 Gerador Stemac by SNMP
-              key: dse.battery.volt
-          - type: STRING
-            name: min
-            value: '0'
-          - type: STRING
-            name: max
-            value: '16'
-          - type: STRING
-            name: thresholds.0.color
-            value: E53935
-          - type: STRING
-            name: thresholds.0.threshold
-            value: '0'
-          - type: STRING
-            name: thresholds.1.color
-            value: FFB300
-          - type: STRING
-            name: thresholds.1.threshold
-            value: '11'
-          - type: STRING
-            name: thresholds.2.color
-            value: 43A047
-          - type: STRING
-            name: thresholds.2.threshold
-            value: '12'
-        - type: gauge
-          name: Temperatura do motor
-          x: '48'
-          y: '24'
-          width: '12'
-          height: '4'
-          fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: DSE892 Gerador Stemac by SNMP
-              key: dse.engine.coolant.temp
-          - type: STRING
-            name: min
-            value: '0'
-          - type: STRING
-            name: max
-            value: '120'
-          - type: STRING
-            name: thresholds.0.color
-            value: 43A047
-          - type: STRING
-            name: thresholds.0.threshold
-            value: '0'
-          - type: STRING
-            name: thresholds.1.color
-            value: FFB300
-          - type: STRING
-            name: thresholds.1.threshold
-            value: '85'
-          - type: STRING
-            name: thresholds.2.color
-            value: E53935
-          - type: STRING
-            name: thresholds.2.threshold
-            value: '95'
-        - type: item
-          name: Último evento (trap)
-          x: '60'
-          y: '24'
-          width: '12'
-          height: '4'
-          fields:
-          - type: ITEM
-            name: itemid.0
+            name: columns.0.itemid
             value:
               host: DSE892 Gerador Stemac by SNMP
               key: dse.trap.description
-        - type: item
-          name: Frequência da rede
+          - type: STRING
+            name: columns.0.name
+            value: Evento
+          - type: INTEGER
+            name: layout
+            value: '1'
+          - type: INTEGER
+            name: show_column_header
+            value: '1'
+          - type: INTEGER
+            name: show_lines
+            value: '25'
+          - type: INTEGER
+            name: show_timestamp
+            value: '1'
+        - type: problems
+          name: Histórico de problemas
           x: '0'
-          y: '28'
-          width: '12'
-          height: '3'
+          y: '32'
+          width: '72'
+          height: '8'
           fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: DSE892 Gerador Stemac by SNMP
-              key: dse.mains.freq
-        - type: item
-          name: Frequência do gerador
-          x: '12'
-          y: '28'
-          width: '12'
-          height: '3'
-          fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: DSE892 Gerador Stemac by SNMP
-              key: dse.gen.freq
-        - type: item
-          name: Potência ativa
-          x: '24'
-          y: '28'
-          width: '12'
-          height: '3'
-          fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: DSE892 Gerador Stemac by SNMP
-              key: dse.gen.power
-        - type: item
-          name: Energia gerada
-          x: '36'
-          y: '28'
-          width: '12'
-          height: '3'
-          fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: DSE892 Gerador Stemac by SNMP
-              key: dse.gen.kwh
-        - type: item
-          name: Horas de motor
-          x: '48'
-          y: '28'
-          width: '12'
-          height: '3'
-          fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: DSE892 Gerador Stemac by SNMP
-              key: dse.engine.hours
-        - type: item
-          name: Partidas
-          x: '60'
-          y: '28'
-          width: '12'
-          height: '3'
-          fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: DSE892 Gerador Stemac by SNMP
-              key: dse.engine.starts
+          - type: INTEGER
+            name: show
+            value: '2'
+          - type: INTEGER
+            name: show_lines
+            value: '25'
   triggers:
+  - uuid: cbd7c8b0214a4e7c966d089d8f12c4e0
+    expression: max(/DSE892 Gerador Stemac by SNMP/dse.battery.volt,3m)=0 or (nodata(/DSE892 Gerador Stemac by SNMP/dse.battery.volt,10m)=1 and nodata(/DSE892 Gerador Stemac by SNMP/dse.gw.uptime,10m)=0)
+    name: 'Gerador: DSE892 sem leitura do controlador'
+    priority: HIGH
+    description: 'Bateria lida como 0: o DSE892 perdeu o DSE7320 (RS485) e devolve NULL, que o Zabbix grava como 0. Demais triggers do controlador ficam suspensas. Ou nenhuma leitura em 10 min com o gateway
+      respondendo: o controlador devolve sentinela (sem sensor), que o pré-processamento descarta. Aí as demais triggers ficam presas no último valor.'
   - uuid: 9b2b96feca4f4ff4bc1ffdd1423c6ee4
     expression: min(/DSE892 Gerador Stemac by SNMP/dse.engine.coolant.temp,3m)>{$DSE.COOLANT.MAX} and last(/DSE892 Gerador Stemac by SNMP/dse.battery.volt)>0
     name: 'Gerador: temperatura do motor alta (> {$DSE.COOLANT.MAX} °C)'
@@ -1078,6 +1018,19 @@ zabbix_export:
     expression: max(/DSE892 Gerador Stemac by SNMP/dse.battery.volt,10m)<{$DSE.BATT.MIN} and last(/DSE892 Gerador Stemac by SNMP/dse.battery.volt)>0
     name: 'Gerador: bateria de partida baixa (< {$DSE.BATT.MIN} V)'
     priority: HIGH
+  - uuid: dea572edd580463895c65b71fc9797f1
+    expression: max(/DSE892 Gerador Stemac by SNMP/dse.battery.volt,30m)<{$DSE.BATT.WARN} and last(/DSE892 Gerador Stemac by SNMP/dse.battery.volt)>0
+    name: 'Gerador: bateria de partida descarregando (< {$DSE.BATT.WARN} V)'
+    priority: AVERAGE
+    description: 'Tensão abaixo do normal de bateria em carga por 30 min: carregador desligado ou com defeito, ou bateria fraca. Verificar antes que chegue a {$DSE.BATT.MIN} V e o motor não dê partida.'
+    dependencies:
+    - name: 'Gerador: bateria de partida baixa (< {$DSE.BATT.MIN} V)'
+      expression: max(/DSE892 Gerador Stemac by SNMP/dse.battery.volt,10m)<{$DSE.BATT.MIN} and last(/DSE892 Gerador Stemac by SNMP/dse.battery.volt)>0
+  - uuid: 2c487fe992cc448db95500929e9d9535
+    expression: min(/DSE892 Gerador Stemac by SNMP/dse.battery.volt,10m)>{$DSE.BATT.MAX}
+    name: 'Gerador: bateria de partida com tensão alta (> {$DSE.BATT.MAX} V)'
+    priority: HIGH
+    description: 'Tensão acima da de carga por 10 min: carregador com defeito sobrecarregando a bateria (aquece, perde água e pode vazar).'
   - uuid: df53b2da2e8e486a91160b475463fddd
     expression: (max(/DSE892 Gerador Stemac by SNMP/dse.mains.volt[L1-N],2m)<{$DSE.MAINS.VMIN} or max(/DSE892 Gerador Stemac by SNMP/dse.mains.volt[L2-N],2m)<{$DSE.MAINS.VMIN} or max(/DSE892 Gerador Stemac
       by SNMP/dse.mains.volt[L3-N],2m)<{$DSE.MAINS.VMIN}) and last(/DSE892 Gerador Stemac by SNMP/dse.battery.volt)>0

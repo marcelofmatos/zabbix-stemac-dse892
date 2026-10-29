@@ -99,13 +99,19 @@ combustivel["preprocessing"].append({
 combustivel["description"] = ("Nível real do tanque: (leitura do controlador − {$DSE.FUEL.EMPTY}) × 100 / "
                               "({$DSE.FUEL.FULL} − {$DSE.FUEL.EMPTY}), limitado a 0–100 %.")
 items.append(combustivel)
-items.append(instrument(5, "dse.battery.volt", "Motor: tensão da bateria de partida", "V", "0.1",
-                        tags=("component", "motor"), triggers=[
-                            trig("Gerador: DSE892 sem leitura do controlador",
-                                 f"max({k('dse.battery.volt')},3m)=0", "HIGH",
-                                 "Bateria lida como 0: o DSE892 perdeu o DSE7320 (RS485) e devolve NULL, "
-                                 "que o Zabbix grava como 0. Demais triggers do controlador ficam suspensas."),
-                        ]))
+items.append(instrument(5, "dse.battery.volt", "Motor: tensão da bateria de partida", "V", "0.1", delay=RAPIDO,
+                        tags=("component", "motor")))
+# Sem leitura: bateria 0 (RS485 caído) ou bateria sem valor por 10 min enquanto o gateway ainda responde
+# (sentinela descartada). Exigir o gateway vivo evita falso alarme quando o próprio Zabbix atrasa a
+# gravação (ex.: backup da VM do Zabbix): aí os dois itens ficam sem dados juntos.
+SEM_LEITURA = trig("Gerador: DSE892 sem leitura do controlador",
+                   f"max({k('dse.battery.volt')},3m)=0 or "
+                   f"(nodata({k('dse.battery.volt')},10m)=1 and nodata({k('dse.gw.uptime')},10m)=0)",
+                   "HIGH",
+                   "Bateria lida como 0: o DSE892 perdeu o DSE7320 (RS485) e devolve NULL, "
+                   "que o Zabbix grava como 0. Demais triggers do controlador ficam suspensas. "
+                   "Ou nenhuma leitura em 10 min com o gateway respondendo: o controlador devolve sentinela "
+                   "(sem sensor), que o pré-processamento descarta. Aí as demais triggers ficam presas no último valor.")
 items.append(instrument(6, "dse.engine.rpm", "Motor: rotação", "rpm", delay=RAPIDO, tags=("component", "motor"), triggers=[
     trig("Gerador: motor em funcionamento",
          f"min({k('dse.engine.rpm')},2m)>0", "WARNING",
@@ -170,7 +176,7 @@ items.append({
     "key": TRAP_KEY, "value_type": "LOG", "history": "90d",
     "description": "Trap dseEventTrap (.1.3.6.1.4.1.41385.1.1.2.1) com a eventEntry nos varbinds.",
     # Sem trigger genérica: o DSE manda trap em todo evento (troca de modo, partida, teste)
-    # e o polling já cobre rede/motor/modo. Só a parada e os alarmes do controlador viram problema.
+    # e o polling já cobre rede/motor/modo. Só a parada por alarme vira problema.
     "tags": [{"tag": "component", "value": "trap"}],
 })
 items.append(trap_field(6, "dse.trap.description", "Trap: descrição do evento"))
@@ -214,18 +220,32 @@ items.append({
 # comunicação viraria "combustível crítico", "falta de rede" etc.
 LINK_OK = f"last({k('dse.battery.volt')})>0"
 
+BATT_BAIXA = trig("Gerador: bateria de partida baixa (< {$DSE.BATT.MIN} V)",
+                  f"max({k('dse.battery.volt')},10m)<{{$DSE.BATT.MIN}} and {LINK_OK}", "HIGH")
+
 PARADA = f"find({k('dse.trap.description')},#1,\"iregexp\",\"shutdown|electrical trip|parada|desligamento\")=1"
 RESET = f"find({k('dse.trap.description')},#1,\"iregexp\",\"^(stop mode|restart)$\")=1"
 
 top_triggers = [
+    SEM_LEITURA,
     trig("Gerador: temperatura do motor alta (> {$DSE.COOLANT.MAX} °C)",
          f"min({k('dse.engine.coolant.temp')},3m)>{{$DSE.COOLANT.MAX}} and {LINK_OK}", "DISASTER"),
     trig("Gerador: combustível crítico (< {$DSE.FUEL.CRIT}%)",
          f"last({k('dse.fuel.level')})<{{$DSE.FUEL.CRIT}} and {LINK_OK}", "DISASTER"),
     trig("Gerador: combustível baixo (< {$DSE.FUEL.LOW}%)",
          f"avg({k('dse.fuel.level')},15m)<{{$DSE.FUEL.LOW}} and {LINK_OK}", "HIGH"),
-    trig("Gerador: bateria de partida baixa (< {$DSE.BATT.MIN} V)",
-         f"max({k('dse.battery.volt')},10m)<{{$DSE.BATT.MIN}} and {LINK_OK}", "HIGH"),
+    BATT_BAIXA,
+    # Aviso antecipado: com o carregador ligado a bateria fica perto de 13 V; descendo para ~12,4 V
+    # ele parou de carregar. Depende da "baixa" para não alertar duas vezes.
+    {**trig("Gerador: bateria de partida descarregando (< {$DSE.BATT.WARN} V)",
+            f"max({k('dse.battery.volt')},30m)<{{$DSE.BATT.WARN}} and {LINK_OK}", "AVERAGE",
+            "Tensão abaixo do normal de bateria em carga por 30 min: carregador desligado ou com defeito, "
+            "ou bateria fraca. Verificar antes que chegue a {$DSE.BATT.MIN} V e o motor não dê partida."),
+     "dependencies": [{"name": BATT_BAIXA["name"], "expression": BATT_BAIXA["expression"]}]},
+    trig("Gerador: bateria de partida com tensão alta (> {$DSE.BATT.MAX} V)",
+         f"min({k('dse.battery.volt')},10m)>{{$DSE.BATT.MAX}}", "HIGH",
+         "Tensão acima da de carga por 10 min: carregador com defeito sobrecarregando a bateria "
+         "(aquece, perde água e pode vazar)."),
     trig("Gerador: falta de rede (tensão de entrada < {$DSE.MAINS.VMIN} V)",
          "(" + " or ".join(f"max({k(f'dse.mains.volt[{p}]')},2m)<{{$DSE.MAINS.VMIN}}"
                            for p in ("L1-N", "L2-N", "L3-N")) + f") and {LINK_OK}",
@@ -268,19 +288,18 @@ G_GEN = "Tensão de saída (gerador) - 3 fases"
 G_LOAD = "Corrente da carga - 3 fases"
 
 
-def w_item(x, y, w, h, name, key):
+def w_item(x, y, w, h, name, key, fonte=None, legenda=None):
+    # Valor e hora (o título do widget já diz o que é) e, se houver, uma legenda curta embaixo.
+    # Clicar no widget abre o histórico do item.
+    show = [1, 2, 3] if legenda else [2, 3]
+    fields = [{"type": "ITEM", "name": "itemid.0", "value": {"host": TPL, "key": key}}]
+    fields += [{"type": "INTEGER", "name": f"show.{i}", "value": str(v)} for i, v in enumerate(show)]
+    if fonte:
+        fields.append({"type": "INTEGER", "name": "value_size", "value": str(fonte)})
+    if legenda:
+        fields += [{"type": "STRING", "name": "description", "value": legenda},
+                   {"type": "INTEGER", "name": "desc_size", "value": "9"}]
     return {"type": "item", "name": name, "x": str(x), "y": str(y), "width": str(w), "height": str(h),
-            "fields": [{"type": "ITEM", "name": "itemid.0", "value": {"host": TPL, "key": key}}]}
-
-
-def w_gauge(x, y, w, h, name, key, lo, hi, thresholds):
-    fields = [{"type": "ITEM", "name": "itemid.0", "value": {"host": TPL, "key": key}},
-              {"type": "STRING", "name": "min", "value": lo},
-              {"type": "STRING", "name": "max", "value": hi}]
-    for i, (color, value) in enumerate(thresholds):
-        fields += [{"type": "STRING", "name": f"thresholds.{i}.color", "value": color},
-                   {"type": "STRING", "name": f"thresholds.{i}.threshold", "value": value}]
-    return {"type": "gauge", "name": name, "x": str(x), "y": str(y), "width": str(w), "height": str(h),
             "fields": fields}
 
 
@@ -294,38 +313,47 @@ def abaixo(dy, widgets):
     return [{**w, "y": str(int(w["y"]) + dy)} for w in widgets]
 
 
-RED, YELLOW, GREEN = "E53935", "FFB300", "43A047"
 PAINEL_ALTURA = 9
+PAINEL_LARGURA = 44
+LADO = 72 - PAINEL_LARGURA
 dashboard = {
     "uuid": uid("dashboard"),
-    "name": "Gerador - visão geral",
-    # Página única: o painel em cima, os gráficos de tensão e corrente logo abaixo e, por fim, os indicadores.
+    "name": "Visão geral",
+    # Página única: o painel (que já mostra modo, motor, rede, gerador e carga), ao lado só os dados que ele
+    # não mostra, e os gráficos de tensão e corrente embaixo.
     "pages": [{"widgets": [
         # widget do módulo painel-gerador (zabbix-module/); host vem do contexto
-        {"type": "painelgerador", "name": "Painel do gerador", "x": "0", "y": "0", "width": "72",
+        {"type": "painelgerador", "name": "Painel do gerador", "x": "0", "y": "0", "width": str(PAINEL_LARGURA),
          "height": str(PAINEL_ALTURA), "fields": [{"type": "INTEGER", "name": "rf_rate", "value": "10"}]},
+        # coluna da direita: o que o painel não mostra. Clicar num card abre o histórico do item
+        # (o do último trap leva à lista de eventos).
+        w_item(PAINEL_LARGURA, 0, LADO, 3, "Último evento (trap)", "dse.trap.description", fonte=30),
+        w_item(PAINEL_LARGURA, 3, LADO // 2, 3, "Energia gerada", "dse.gen.kwh"),
+        w_item(PAINEL_LARGURA + LADO // 2, 3, LADO // 2, 3, "Potência aparente", "dse.gen.va"),
+        w_item(PAINEL_LARGURA, 6, LADO // 2, 3, "Fator de potência", "dse.gen.pf", fonte=22,
+               legenda="Potência útil ÷ total (0 a 1), ideal ≥ 0,9\nSó tem valor com o gerador em carga"),
+        w_item(PAINEL_LARGURA + LADO // 2, 6, LADO // 2, 3, "Gateway DSE892 ligado há", "dse.gw.uptime", fonte=22),
     ] + abaixo(PAINEL_ALTURA, [
         # gráficos: tensão de entrada x saída, corrente da carga
         w_graph(0, 0, 36, 8, G_MAINS),
         w_graph(36, 0, 36, 8, G_GEN),
         w_graph(0, 8, 72, 7, G_LOAD),
-        # indicadores: estado e motor
-        w_item(0, 15, 12, 4, "Modo do controlador", "dse.mode.text"),
-        w_item(12, 15, 12, 4, "Rotação do motor", "dse.engine.rpm"),
-        w_gauge(24, 15, 12, 4, "Combustível", "dse.fuel.level", "0", "100",
-                [(RED, "0"), (YELLOW, "20"), (GREEN, "50")]),
-        w_gauge(36, 15, 12, 4, "Bateria de partida", "dse.battery.volt", "0", "16",
-                [(RED, "0"), (YELLOW, "11"), (GREEN, "12")]),
-        w_gauge(48, 15, 12, 4, "Temperatura do motor", "dse.engine.coolant.temp", "0", "120",
-                [(GREEN, "0"), (YELLOW, "85"), (RED, "95")]),
-        w_item(60, 15, 12, 4, "Último evento (trap)", "dse.trap.description"),
-        # indicadores: rede x gerador
-        w_item(0, 19, 12, 3, "Frequência da rede", "dse.mains.freq"),
-        w_item(12, 19, 12, 3, "Frequência do gerador", "dse.gen.freq"),
-        w_item(24, 19, 12, 3, "Potência ativa", "dse.gen.power"),
-        w_item(36, 19, 12, 3, "Energia gerada", "dse.gen.kwh"),
-        w_item(48, 19, 12, 3, "Horas de motor", "dse.engine.hours"),
-        w_item(60, 19, 12, 3, "Partidas", "dse.engine.starts"),
+        # histórico de eventos do controlador (traps), mais recente em cima
+        {"type": "itemhistory", "name": "Eventos do gerador (traps)", "x": "0", "y": "15", "width": "72",
+         "height": "8", "fields": [
+             {"type": "ITEM", "name": "columns.0.itemid", "value": {"host": TPL, "key": "dse.trap.description"}},
+             {"type": "STRING", "name": "columns.0.name", "value": "Evento"},
+             {"type": "INTEGER", "name": "layout", "value": "1"},
+             {"type": "INTEGER", "name": "show_column_header", "value": "1"},
+             {"type": "INTEGER", "name": "show_lines", "value": "25"},
+             {"type": "INTEGER", "name": "show_timestamp", "value": "1"},
+         ]},
+        # histórico de problemas do host (abertos e resolvidos), mais recente em cima
+        {"type": "problems", "name": "Histórico de problemas", "x": "0", "y": "23", "width": "72",
+         "height": "8", "fields": [
+             {"type": "INTEGER", "name": "show", "value": "2"},  # 2 = histórico (1 recentes, 3 atuais)
+             {"type": "INTEGER", "name": "show_lines", "value": "25"},
+         ]},
     ])}],
 }
 
@@ -353,6 +381,10 @@ export = {"zabbix_export": {
             {"macro": "{$DSE.FUEL.EMPTY}", "value": "0",
              "description": "Leitura do sensor (%) com o tanque vazio. 0 = sem correção"},
             {"macro": "{$DSE.BATT.MIN}", "value": "11"},
+            {"macro": "{$DSE.BATT.WARN}", "value": "12.2",
+             "description": "Abaixo disto por 30 min: bateria descarregando (carregador parado)"},
+            {"macro": "{$DSE.BATT.MAX}", "value": "15",
+             "description": "Acima disto por 10 min: carregador sobrecarregando a bateria"},
             {"macro": "{$DSE.COOLANT.MAX}", "value": "95"},
         ],
         "tags": [{"tag": "class", "value": "power"}, {"tag": "target", "value": "dse892"}],

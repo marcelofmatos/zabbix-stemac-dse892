@@ -5,7 +5,7 @@ Monitoramento e operação no **Zabbix 7.0** de um grupo gerador (Stemac ou outr
 
 | Componente | Pasta | O que faz |
 |---|---|---|
-| Template `DSE892 Gerador Stemac by SNMP` | [`zabbix/`](zabbix/) | 38 itens (rede, gerador, motor, modo, traps), 14 triggers, 3 gráficos e dashboard do host |
+| Template `DSE892 Gerador Stemac by SNMP` | [`zabbix/`](zabbix/) | 38 itens (rede, gerador, motor, modo, traps), 16 triggers, 3 gráficos e dashboard do host |
 | Comandos do controlador | [`zabbix/criar_comandos.py`](zabbix/criar_comandos.py) | Scripts Webhook Stop / Manual / Partida / Teste / Auto, com confirmação e grupo restrito |
 | Widget **Painel do gerador** | [`zabbix-module/painel-gerador/`](zabbix-module/painel-gerador/) | Diagrama unifilar, modo, alarme, motor, tanque e botões de comando |
 | Página **Gerador (celular)** | [`zabbix-module/gerador-movel/`](zabbix-module/gerador-movel/) | O mesmo painel em coluna única para celular, com gráficos |
@@ -89,11 +89,14 @@ Vincule-o a um host com **interface SNMP v2c** apontando para o DSE892 e defina 
 | `{$DSE.FUEL.FULL}` | 100 | Leitura do sensor com o tanque cheio. Para tanque adaptado (ex.: marca 63 % cheio), defina no host e o item reescala para 0–100 % |
 | `{$DSE.FUEL.EMPTY}` | 0 | Leitura do sensor com o tanque vazio (ex.: marca 20 % vazio). Nível = (leitura − EMPTY) × 100 / (FULL − EMPTY), limitado a 0–100 % |
 | `{$DSE.BATT.MIN}` | 11 | Bateria de partida mínima (V) |
+| `{$DSE.BATT.WARN}` | 12.2 | Abaixo disto por 30 min: bateria descarregando (carregador parado) |
+| `{$DSE.BATT.MAX}` | 15 | Acima disto por 10 min: carregador sobrecarregando a bateria |
 | `{$DSE.COOLANT.MAX}` | 95 | Temperatura máxima do motor (°C) |
 
 **Triggers:** temperatura alta, combustível crítico e parada por alarme (Desastre); combustível baixo, bateria baixa,
-alarme do controlador, falta de rede, gerador assumiu a carga, controlador fora do Auto, gateway sem SNMP e DSE892 sem
-leitura do controlador (Alta); motor em funcionamento (Atenção); gateway reiniciou (Info).
+bateria com tensão alta, alarme do controlador, falta de rede, gerador assumiu a carga, controlador fora do Auto, gateway sem SNMP e DSE892 sem
+leitura do controlador (Alta); bateria descarregando (Média, depende da de bateria baixa); motor em funcionamento
+(Atenção); gateway reiniciou (Info).
 
 **Traps sem ruído:** o DSE892 manda trap em **todo** evento (troca de modo, teste semanal...). Só a
 parada por alarme (`shutdown`, `electrical trip`...) e os alarmes do controlador viram problema. O resto fica no
@@ -107,11 +110,20 @@ Avisos de *Manutenção* ficam de fora. Daí saem três triggers, que fecham no 
 |---|---|
 | Alta | *Gerador: alarme do controlador: texto*, mesmo sem parada |
 | Desastre | *Gerador: parada por alarme: texto*: trap de parada com alarme nos 10 min anteriores (o nome traz a causa) |
-| Desastre | *Gerador: parada por alarme (trap): Shutdown*: parada sem alarme anterior | O receptor não precisa da MIB: as regex usam os OIDs numéricos.
+| Desastre | *Gerador: parada por alarme (trap): Shutdown*: parada sem alarme anterior |
+
+O receptor não precisa da MIB: as regex usam os OIDs numéricos.
 
 **Valores ausentes:** sentinelas GenComm (≥ `0x7FFFFFF8`) são descartadas. Quando o DSE892 não tem o
 valor (sensor ausente ou RS485 caído), responde `NULL`, que o Zabbix grava como **0**. Por isso as
-triggers do controlador têm a guarda `last(bateria) > 0`, e a perda de leitura tem trigger própria.
+triggers do controlador têm a guarda `last(bateria) > 0`, e a perda de leitura tem trigger própria:
+*DSE892 sem leitura do controlador* dispara com bateria 0 por 3 min, ou com a bateria **sem valor por 10 min
+enquanto o gateway ainda responde** (sentinela descartada). Exigir o gateway vivo evita falso alarme quando o
+próprio Zabbix atrasa a gravação (ex.: backup da VM do Zabbix): aí os dois itens ficam sem dados juntos.
+
+**Dashboard do host (Visão geral):** painel do gerador e, ao lado, o que ele não mostra (último evento,
+energia, potência aparente, fator de potência, tempo ligado do gateway); embaixo, gráficos de tensão e corrente,
+a lista *Eventos do gerador (traps)* e o *Histórico de problemas* do host (abertos e resolvidos).
 
 ## 3. Comandos do controlador
 
@@ -173,7 +185,7 @@ Nos dois casos, depois em *Administration → General → Modules*: **Scan direc
 módulos. O estado ativo fica no banco, então trocar a versão da imagem não exige ativar de novo.
 
 - **Painel do gerador** (`painel-gerador`): widget já incluído na dashboard do template
-  ("Gerador - visão geral"). Também pode ser adicionado a qualquer dashboard, escolhendo o host.
+  ("Visão geral"). Também pode ser adicionado a qualquer dashboard, escolhendo o host.
   A posição das chaves no diagrama é **estimada**, porque o DSE892 não informa os contatores.
 - **Gerador (celular)** (`gerador-movel`): `zabbix.php?action=gerador.movel[&hostid=…]`. Sem
   `hostid`, abre o primeiro host visível com o template. Atualiza a cada 10 s. **Depende do
